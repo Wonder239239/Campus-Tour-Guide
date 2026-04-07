@@ -276,14 +276,6 @@ select {
   box-shadow: 0 0 0 8px rgba(159, 224, 255, 0.22);
 }
 
-.map-poi-dot {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #7c5cff;
-  border: 3px solid #ffffff;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-}
 
 .status-stack {
   display: grid;

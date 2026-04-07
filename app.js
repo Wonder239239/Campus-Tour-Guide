@@ -172,8 +172,6 @@ const elements = {
 let map;
 let userMarker;
 let watchId = null;
-let poiLayers = [];
-let radiusLayers = [];
 
 const translatableIds = [
   "heroTag",
@@ -278,32 +276,6 @@ function renderMap() {
       attribution: "&copy; OpenStreetMap contributors"
     }).addTo(map);
   }
-
-  poiLayers.forEach((layer) => layer.remove());
-  radiusLayers.forEach((layer) => layer.remove());
-  poiLayers = [];
-  radiusLayers = [];
-
-  const t = getCopy();
-
-  pois.forEach((poi) => {
-    const marker = L.marker([poi.lat, poi.lon], {
-      icon: createMapIcon("map-poi-dot")
-    })
-      .addTo(map)
-      .bindPopup(`<strong>${t[poi.nameKey]}</strong>`);
-
-    const radius = L.circle([poi.lat, poi.lon], {
-      radius: poi.radius,
-      color: "#af92ff",
-      weight: 2,
-      fillColor: "#8d6bff",
-      fillOpacity: 0.14
-    }).addTo(map);
-
-    poiLayers.push(marker);
-    radiusLayers.push(radius);
-  });
 
   setTimeout(() => map.invalidateSize(), 150);
 }
