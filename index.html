@@ -10,6 +10,12 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&family=Space+Grotesk:wght@500;700&display=swap"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
     <link rel="stylesheet" href="./styles.css" />
     <script
       type="module"
@@ -81,10 +87,7 @@
           </div>
 
           <div class="map-stage">
-            <img src="./assets/campus-map.svg" alt="campus map" class="campus-map" />
-            <div class="map-pin library-pin"><span id="poiLibrary">西浦图书馆</span></div>
-            <div class="map-pin garden-pin"><span id="poiGarden">西浦博物馆</span></div>
-            <div class="map-pin hall-pin"><span id="poiHall">南校区体育中心</span></div>
+            <div id="leafletMap" class="leaflet-map" aria-label="XJTLU live map"></div>
           </div>
 
           <div class="status-stack">
@@ -154,6 +157,11 @@
       </section>
     </div>
 
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
     <script src="./app.js"></script>
   </body>
 </html>

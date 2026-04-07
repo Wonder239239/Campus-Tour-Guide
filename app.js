@@ -155,6 +155,7 @@ const elements = {
   backToRoleBtn: document.getElementById("backToRoleBtn"),
   startLocationBtn: document.getElementById("startLocationBtn"),
   demoArrivalBtn: document.getElementById("demoArrivalBtn"),
+  leafletMap: document.getElementById("leafletMap"),
   locateTitle: document.getElementById("locateTitle"),
   locateBody: document.getElementById("locateBody"),
   arrivalTitle: document.getElementById("arrivalTitle"),
@@ -167,6 +168,12 @@ const elements = {
   playAudioBtn: document.getElementById("playAudioBtn"),
   stopAudioBtn: document.getElementById("stopAudioBtn")
 };
+
+let map;
+let userMarker;
+let watchId = null;
+let poiLayers = [];
+let radiusLayers = [];
 
 const translatableIds = [
   "heroTag",
@@ -183,9 +190,6 @@ const translatableIds = [
   "mapKicker",
   "mapTitle",
   "backToRoleBtn",
-  "poiLibrary",
-  "poiGarden",
-  "poiHall",
   "locateTitle",
   "locateBody",
   "arrivalTitle",
@@ -251,6 +255,57 @@ function setRole(role) {
   state.role = role;
   elements.roleChips.forEach((chip) => chip.classList.toggle("active", chip.dataset.role === role));
   elements.selectionHint.textContent = getCopy().roleReady(role);
+}
+
+function createMapIcon(className) {
+  return L.divIcon({
+    className: "",
+    html: `<div class="${className}"></div>`,
+    iconSize: [18, 18],
+    iconAnchor: [9, 9]
+  });
+}
+
+function renderMap() {
+  if (!map) {
+    map = L.map(elements.leafletMap, {
+      zoomControl: true,
+      attributionControl: true
+    }).setView([31.2749, 120.7425], 17);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: "&copy; OpenStreetMap contributors"
+    }).addTo(map);
+  }
+
+  poiLayers.forEach((layer) => layer.remove());
+  radiusLayers.forEach((layer) => layer.remove());
+  poiLayers = [];
+  radiusLayers = [];
+
+  const t = getCopy();
+
+  pois.forEach((poi) => {
+    const marker = L.marker([poi.lat, poi.lon], {
+      icon: createMapIcon("map-poi-dot")
+    })
+      .addTo(map)
+      .bindPopup(`<strong>${t[poi.nameKey]}</strong>`);
+
+    const radius = L.circle([poi.lat, poi.lon], {
+      radius: poi.radius,
+      color: "#af92ff",
+      weight: 2,
+      fillColor: "#8d6bff",
+      fillOpacity: 0.14
+    }).addTo(map);
+
+    poiLayers.push(marker);
+    radiusLayers.push(radius);
+  });
+
+  setTimeout(() => map.invalidateSize(), 150);
 }
 
 function haversineMeters(lat1, lon1, lat2, lon2) {
@@ -333,7 +388,21 @@ function handleLocationSuccess(position) {
   elements.locateTitle.textContent = t.locating;
   elements.locateBody.textContent = `${position.coords.latitude.toFixed(5)}, ${position.coords.longitude.toFixed(5)}`;
 
+  const latLng = [position.coords.latitude, position.coords.longitude];
+  if (!userMarker) {
+    userMarker = L.marker(latLng, {
+      icon: createMapIcon("map-user-dot")
+    }).addTo(map);
+  } else {
+    userMarker.setLatLng(latLng);
+  }
+  map.flyTo(latLng, Math.max(map.getZoom(), 18), { duration: 0.8 });
+
   if (nearest.distance <= nearest.poi.radius) {
+    if (watchId !== null) {
+      navigator.geolocation.clearWatch(watchId);
+      watchId = null;
+    }
     handleArrival(nearest.poi);
   } else {
     state.activePoi = nearest.poi;
@@ -351,6 +420,7 @@ function handleLocationError() {
 }
 
 function requestLocation() {
+  renderMap();
   elements.locateTitle.textContent = getCopy().requestingLocation;
   elements.locateBody.textContent = getCopy().locateBody;
   elements.demoArrivalBtn.classList.add("hidden");
@@ -360,7 +430,11 @@ function requestLocation() {
     return;
   }
 
-  navigator.geolocation.getCurrentPosition(handleLocationSuccess, handleLocationError, {
+  if (watchId !== null) {
+    navigator.geolocation.clearWatch(watchId);
+  }
+
+  watchId = navigator.geolocation.watchPosition(handleLocationSuccess, handleLocationError, {
     enableHighAccuracy: true,
     timeout: 10000,
     maximumAge: 0
@@ -388,6 +462,7 @@ elements.goMapBtn.addEventListener("click", () => {
     return;
   }
   showScreen(elements.mapScreen);
+  renderMap();
 });
 
 elements.backToRoleBtn.addEventListener("click", () => showScreen(elements.roleScreen));
@@ -399,6 +474,7 @@ elements.backToMapBtn.addEventListener("click", () => {
   window.speechSynthesis.cancel();
   stopCameraFeed();
   showScreen(elements.mapScreen);
+  renderMap();
 });
 
 applyTranslations();
