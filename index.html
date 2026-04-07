@@ -18,118 +18,105 @@
   </head>
   <body>
     <div class="app-shell">
-      <header class="hero">
-        <div class="hero-copy">
-          <p class="eyebrow" id="heroTag">XJTLU Campus AR Guide</p>
-          <h1 id="heroTitle">选择身份与语言，开始西交利物浦大学 AR 导览</h1>
+      <section class="screen screen-active intro-screen" id="introScreen">
+        <div class="screen-card hero-card">
+          <p class="eyebrow" id="heroTag">XJTLU Campus Guide</p>
+          <h1 id="heroTitle">欢迎来到西交利物浦大学校园导览</h1>
           <p class="hero-text" id="heroText">
-            先查看校园地图，然后授权定位。系统会判断你是否已经靠近景点，并在到达后引导你进入 AR
-            讲解。
+            先选择页面语言，然后进入身份选择。系统会在地图页获取实时定位，并在你到达景点后自动打开 AR 讲解页面。
           </p>
-        </div>
-        <div class="hero-card">
+
           <div class="field-group">
-            <p class="field-label" id="roleLabel">身份</p>
-            <div class="chip-row" id="roleChips">
-              <button class="chip" data-role="student">学生</button>
-              <button class="chip" data-role="visitor">访客</button>
-            </div>
+            <label class="select-field">
+              <span id="languageLabel">语言</span>
+              <select id="languageSelect">
+                <option value="zh">中文</option>
+                <option value="en">English</option>
+              </select>
+            </label>
           </div>
 
-          <label class="select-field">
-            <span id="languageLabel">语言</span>
-            <select id="languageSelect">
-              <option value="zh">中文</option>
-              <option value="en">English</option>
-            </select>
-          </label>
-
-          <button class="primary-btn" id="startTourBtn">开始导览</button>
-          <p class="status-text" id="selectionHint">请先选择身份与语言。</p>
+          <div class="button-row">
+            <button class="primary-btn" id="goRoleBtn">进入身份选择</button>
+          </div>
         </div>
-      </header>
+      </section>
 
-      <main>
-        <section class="panel map-panel">
+      <section class="screen hidden" id="roleScreen">
+        <div class="screen-card choice-card">
+          <p class="eyebrow" id="roleKicker">Choose Your Identity</p>
+          <h2 id="roleTitle">请选择身份</h2>
+          <p class="screen-text" id="roleText">
+            选择学生或访客后，进入校园地图与实时定位页面。
+          </p>
+
+          <div class="chip-grid" id="roleChips">
+            <button class="choice-chip" data-role="student" id="studentChip">学生</button>
+            <button class="choice-chip" data-role="visitor" id="visitorChip">访客</button>
+          </div>
+
+          <p class="status-text" id="selectionHint">请先选择身份。</p>
+
+          <div class="button-row">
+            <button class="ghost-btn" id="backToIntroBtn">返回上一步</button>
+            <button class="primary-btn" id="goMapBtn">进入校园地图</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen hidden" id="mapScreen">
+        <div class="screen-card map-card">
           <div class="section-heading">
             <div>
               <p class="section-kicker" id="mapKicker">XJTLU SIP Campus</p>
               <h2 id="mapTitle">西交利物浦大学校园地图</h2>
             </div>
-            <div class="legend">
-              <span class="legend-dot library"></span>
-              <span id="legendLibrary">西浦图书馆</span>
-            </div>
+            <button class="ghost-btn" id="backToRoleBtn">返回身份选择</button>
           </div>
 
           <div class="map-stage">
-            <img
-              src="./assets/campus-map.svg"
-              alt="campus map"
-              class="campus-map"
-            />
-            <div class="map-pin library-pin">
-              <span id="poiLibrary">西浦图书馆</span>
-            </div>
-            <div class="map-pin garden-pin">
-              <span id="poiGarden">西浦博物馆</span>
-            </div>
-            <div class="map-pin hall-pin">
-              <span id="poiHall">南校区体育中心</span>
-            </div>
-          </div>
-        </section>
-
-        <section class="panel flow-panel">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker" id="flowKicker">Live XJTLU Tour</p>
-              <h2 id="flowTitle">西浦导览状态</h2>
-            </div>
+            <img src="./assets/campus-map.svg" alt="campus map" class="campus-map" />
+            <div class="map-pin library-pin"><span id="poiLibrary">西浦图书馆</span></div>
+            <div class="map-pin garden-pin"><span id="poiGarden">西浦博物馆</span></div>
+            <div class="map-pin hall-pin"><span id="poiHall">南校区体育中心</span></div>
           </div>
 
           <div class="status-stack">
-            <div class="status-card active" id="locateCard">
+            <div class="status-card active">
               <p class="step-number">01</p>
               <div>
-                <h3 id="locateTitle">等待开始定位</h3>
-                <p id="locateBody">
-                  点击“开始导览”后，网页会请求定位权限并检测你与校园景点的距离。
-                </p>
+                <h3 id="locateTitle">开始实时定位</h3>
+                <p id="locateBody">点击下方按钮后，网页会请求定位权限并检测你是否靠近景点。</p>
               </div>
             </div>
-
-            <div class="status-card" id="arrivalCard">
+            <div class="status-card">
               <p class="step-number">02</p>
               <div>
-                <h3 id="arrivalTitle">未到达景点</h3>
-                <p id="arrivalBody">定位完成后，这里会显示最近景点与当前距离。</p>
+                <h3 id="arrivalTitle">等待到达建筑</h3>
+                <p id="arrivalBody">当你到达西浦图书馆、西浦博物馆或南校区体育中心时，系统会自动跳转到 AR 讲解页面。</p>
               </div>
-            </div>
-
-            <div class="prompt-card hidden" id="arrivalPrompt">
-              <p class="prompt-badge" id="promptBadge">Arrival Detected</p>
-              <h3 id="promptTitle">你已到达西浦图书馆</h3>
-              <p id="promptBody">点击下方按钮，进入 AR 讲解页面。</p>
-              <div class="button-row">
-                <button class="primary-btn" id="enterArBtn">进入 AR 讲解</button>
-                <button class="ghost-btn" id="retryBtn">重新定位</button>
-              </div>
-            </div>
-
-            <div class="button-row subtle-row">
-              <button class="ghost-btn hidden" id="demoArrivalBtn">模拟靠近最近景点</button>
             </div>
           </div>
-        </section>
 
-        <section class="panel camera-panel hidden" id="cameraPanel">
+          <div class="button-row">
+            <button class="primary-btn" id="startLocationBtn">开始实时定位</button>
+            <button class="ghost-btn hidden" id="demoArrivalBtn">模拟到达最近景点</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen hidden" id="arScreen">
+        <div class="screen-card ar-card">
           <div class="camera-header">
             <div>
               <p class="section-kicker" id="cameraKicker">AR Storytelling</p>
               <h2 id="cameraTitle">西浦 AR 讲解页</h2>
             </div>
-            <button class="ghost-btn" id="backBtn">返回首页</button>
+            <button class="ghost-btn" id="backToMapBtn">返回地图页</button>
+          </div>
+
+          <div class="arrival-banner" id="arrivalBanner">
+            你已到达西浦图书馆，正在打开 AR 讲解。
           </div>
 
           <div class="camera-stage">
@@ -137,7 +124,6 @@
             <div class="camera-overlay"></div>
             <div class="avatar-card">
               <model-viewer
-                id="avatarViewer"
                 src="https://modelviewer.dev/shared-assets/models/Astronaut.glb"
                 camera-controls
                 auto-rotate
@@ -150,7 +136,7 @@
               <p class="narration-label" id="narrationLabel">Now Playing</p>
               <h3 id="narrationTitle">西浦图书馆 AR 讲解</h3>
               <p id="narrationBody">
-                欢迎来到西浦图书馆。这里位于中心楼内，集合了纸质馆藏、数字资源与开放学习空间。
+                图书馆位于中心楼 3 至 10 层，是支持学习、教学与研究的重要空间。
               </p>
               <div class="button-row">
                 <button class="primary-btn" id="playAudioBtn">播放讲解</button>
@@ -158,8 +144,8 @@
               </div>
             </div>
           </div>
-        </section>
-      </main>
+        </div>
+      </section>
     </div>
 
     <script src="./app.js"></script>

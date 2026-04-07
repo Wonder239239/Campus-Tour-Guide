@@ -1,5 +1,4 @@
 :root {
-  --bg: #f2eee4;
   --panel: rgba(255, 250, 244, 0.9);
   --panel-strong: #fff9f0;
   --text: #182126;
@@ -32,109 +31,140 @@ select {
 }
 
 .app-shell {
-  width: min(1200px, calc(100% - 32px));
+  width: min(1180px, calc(100% - 24px));
   margin: 0 auto;
-  padding: 32px 0 48px;
+  padding: 20px 0 32px;
 }
 
-.hero {
+.screen {
+  min-height: calc(100vh - 52px);
   display: grid;
-  grid-template-columns: 1.3fr 0.9fr;
-  gap: 24px;
-  align-items: stretch;
+  place-items: center;
 }
 
-.hero-copy,
-.hero-card,
-.panel {
+.screen-card {
+  width: min(100%, 980px);
   border: 1px solid var(--line);
   background: var(--panel);
-  border-radius: 28px;
+  border-radius: 30px;
   box-shadow: var(--shadow);
   backdrop-filter: blur(12px);
 }
 
-.hero-copy {
-  padding: 36px;
-  min-height: 280px;
+.hero-card,
+.choice-card,
+.map-card,
+.ar-card {
+  padding: 28px;
+}
+
+.hero-card {
+  min-height: 72vh;
+  display: grid;
+  align-content: center;
+  gap: 18px;
   position: relative;
   overflow: hidden;
 }
 
-.hero-copy::after {
+.hero-card::after {
   content: "";
   position: absolute;
   inset: auto -40px -60px auto;
-  width: 220px;
-  height: 220px;
+  width: 240px;
+  height: 240px;
   border-radius: 50%;
   background: linear-gradient(180deg, rgba(212, 160, 23, 0.28), rgba(166, 25, 46, 0.12));
-  filter: blur(4px);
+  filter: blur(6px);
+}
+
+.choice-card {
+  max-width: 720px;
+  min-height: 60vh;
+  display: grid;
+  align-content: center;
+  gap: 20px;
+}
+
+.map-card,
+.ar-card {
+  display: grid;
+  gap: 20px;
 }
 
 .eyebrow,
 .section-kicker,
-.prompt-badge,
 .narration-label {
+  margin: 0;
   font-family: "Space Grotesk", sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-size: 0.8rem;
 }
 
-.hero h1,
-.panel h2,
-.status-card h3,
-.prompt-card h3,
-.narration-card h3 {
+h1,
+h2,
+h3,
+p {
   margin: 0;
 }
 
-.hero h1 {
-  margin-top: 12px;
-  font-size: clamp(2.3rem, 5vw, 4rem);
+h1 {
+  font-size: clamp(2.6rem, 6vw, 4.6rem);
   line-height: 1.02;
-  max-width: 12ch;
+  max-width: 10ch;
 }
 
-.hero-text {
-  margin-top: 16px;
-  max-width: 58ch;
+h2 {
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+}
+
+.hero-text,
+.screen-text,
+.status-text,
+.status-card p:last-child,
+.narration-card p,
+.arrival-banner {
   color: var(--muted);
   line-height: 1.7;
 }
 
-.hero-card {
-  padding: 28px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 22px;
-}
-
-.field-group {
+.field-group,
+.select-field {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.field-label,
 .select-field span {
   font-weight: 700;
 }
 
-.chip-row,
-.button-row {
+select {
+  width: min(280px, 100%);
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  padding: 14px 16px;
+  background: var(--panel-strong);
+}
+
+.button-row,
+.chip-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
 }
 
-.chip,
+.chip-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.choice-chip,
 .primary-btn,
 .ghost-btn {
   border-radius: 999px;
-  padding: 12px 18px;
+  padding: 14px 18px;
   border: 1px solid transparent;
   cursor: pointer;
   transition:
@@ -143,12 +173,14 @@ select {
     border-color 180ms ease;
 }
 
-.chip {
+.choice-chip {
+  min-height: 72px;
   background: #f4efe7;
   color: var(--text);
+  font-weight: 700;
 }
 
-.chip.active {
+.choice-chip.active {
   background: var(--brand);
   color: #fff;
 }
@@ -165,43 +197,10 @@ select {
   color: var(--text);
 }
 
-.chip:hover,
+.choice-chip:hover,
 .primary-btn:hover,
-.ghost-btn:hover,
-.chip:focus-visible,
-.primary-btn:focus-visible,
-.ghost-btn:focus-visible {
+.ghost-btn:hover {
   transform: translateY(-1px);
-}
-
-.select-field {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-select {
-  width: 100%;
-  border-radius: 16px;
-  border: 1px solid var(--line);
-  padding: 14px 16px;
-  background: var(--panel-strong);
-}
-
-.status-text {
-  margin: 0;
-  min-height: 24px;
-  color: var(--muted);
-}
-
-main {
-  margin-top: 24px;
-  display: grid;
-  gap: 24px;
-}
-
-.panel {
-  padding: 28px;
 }
 
 .section-heading,
@@ -210,26 +209,6 @@ main {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 20px;
-}
-
-.legend {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--muted);
-}
-
-.legend-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  display: inline-block;
-}
-
-.legend-dot.library,
-.library-pin {
-  background: #a6192e;
 }
 
 .map-stage {
@@ -273,6 +252,7 @@ main {
 .library-pin {
   top: 29%;
   left: 54%;
+  background: #a6192e;
 }
 
 .garden-pin {
@@ -293,10 +273,10 @@ main {
 }
 
 .status-card,
-.prompt-card,
-.narration-card {
+.narration-card,
+.arrival-banner {
   border-radius: 24px;
-  padding: 22px;
+  padding: 20px;
 }
 
 .status-card {
@@ -307,13 +287,7 @@ main {
   background: rgba(255, 255, 255, 0.52);
 }
 
-.status-card.active {
-  border-color: rgba(166, 25, 46, 0.28);
-  background: rgba(166, 25, 46, 0.08);
-}
-
 .step-number {
-  margin: 0;
   min-width: 52px;
   height: 52px;
   border-radius: 18px;
@@ -325,25 +299,14 @@ main {
   font-weight: 700;
 }
 
-.status-card p:last-child,
-.prompt-card p,
-.narration-card p {
-  color: var(--muted);
-  line-height: 1.7;
-}
-
-.prompt-card {
+.arrival-banner {
   background: linear-gradient(135deg, rgba(166, 25, 46, 0.13), rgba(212, 160, 23, 0.14));
   border: 1px solid rgba(166, 25, 46, 0.2);
 }
 
-.subtle-row {
-  justify-content: flex-start;
-}
-
 .camera-stage {
   position: relative;
-  min-height: 620px;
+  min-height: 68vh;
   border-radius: 28px;
   overflow: hidden;
   background: #091318;
@@ -405,7 +368,7 @@ model-viewer {
   right: 5%;
   bottom: 6%;
   width: min(36vw, 380px);
-  background: rgba(255, 250, 244, 0.88);
+  background: rgba(255, 250, 244, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.4);
   box-shadow: 0 18px 32px rgba(0, 0, 0, 0.2);
 }
@@ -425,7 +388,7 @@ model-viewer {
 }
 
 @media (max-width: 920px) {
-  .hero {
+  .chip-grid {
     grid-template-columns: 1fr;
   }
 
@@ -451,20 +414,29 @@ model-viewer {
 
 @media (max-width: 640px) {
   .app-shell {
-    width: min(100% - 20px, 1200px);
-    padding-top: 16px;
+    width: min(100% - 16px, 1180px);
+    padding-top: 12px;
   }
 
-  .hero-copy,
-  .hero-card,
-  .panel {
-    border-radius: 22px;
+  .screen {
+    min-height: calc(100vh - 32px);
   }
 
-  .hero-copy,
   .hero-card,
-  .panel {
+  .choice-card,
+  .map-card,
+  .ar-card {
     padding: 22px;
+  }
+
+  .screen-card {
+    border-radius: 24px;
+  }
+
+  .section-heading,
+  .camera-header {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .map-stage {
