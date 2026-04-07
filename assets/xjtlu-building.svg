@@ -1,0 +1,39 @@
+<svg width="640" height="420" viewBox="0 0 640 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="640" height="420" rx="28" fill="url(#bg)"/>
+  <path d="M106 307H537" stroke="white" stroke-width="4" stroke-linecap="round"/>
+  <path d="M147 274V121L252 121L252 81L304 121L401 121V265" stroke="white" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M252 81L252 121" stroke="white" stroke-width="4"/>
+  <path d="M252 121L304 121" stroke="white" stroke-width="4"/>
+  <path d="M185 172L185 137L232 137L214 182L185 172Z" stroke="white" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M147 229L228 205L255 174L255 147L388 147" stroke="white" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M388 147L388 257L269 257L242 286L147 286" stroke="white" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M318 257L451 257L489 183L489 148L416 148" stroke="white" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M433 286H489L539 286" stroke="white" stroke-width="4" stroke-linecap="round"/>
+  <path d="M410 126H505V214H410" stroke="white" stroke-width="3"/>
+  <path d="M424 128L424 213" stroke="white" stroke-opacity="0.85" stroke-width="2"/>
+  <path d="M432 128L432 213" stroke="white" stroke-opacity="0.85" stroke-width="2"/>
+  <path d="M440 128L440 213" stroke="white" stroke-opacity="0.85" stroke-width="2"/>
+  <path d="M448 128L448 213" stroke="white" stroke-opacity="0.85" stroke-width="2"/>
+  <path d="M456 128L456 213" stroke="white" stroke-opacity="0.85" stroke-width="2"/>
+  <path d="M464 128L464 213" stroke="white" stroke-opacity="0.85" stroke-width="2"/>
+  <path d="M472 128L472 213" stroke="white" stroke-opacity="0.85" stroke-width="2"/>
+  <path d="M480 128L480 213" stroke="white" stroke-opacity="0.85" stroke-width="2"/>
+  <path d="M488 128L488 213" stroke="white" stroke-opacity="0.85" stroke-width="2"/>
+  <path d="M298 87H396V215H298" stroke="white" stroke-width="3"/>
+  <path d="M308 88L308 213" stroke="white" stroke-opacity="0.85" stroke-width="2"/>
+  <path d="M316 88L316 213" stroke="white" stroke-opacity="0.85" stroke-width="2"/>
+  <path d="M324 88L324 213" stroke="white" stroke-opacity="0.85" stroke-width="2"/>
+  <path d="M332 88L332 213" stroke="white" stroke-opacity="0.85" stroke-width="2"/>
+  <path d="M340 88L340 213" stroke="white" stroke-opacity="0.85" stroke-width="2"/>
+  <path d="M348 88L348 213" stroke="white" stroke-opacity="0.85" stroke-width="2"/>
+  <path d="M356 88L356 213" stroke="white" stroke-opacity="0.85" stroke-width="2"/>
+  <path d="M364 88L364 213" stroke="white" stroke-opacity="0.85" stroke-width="2"/>
+  <path d="M372 88L372 213" stroke="white" stroke-opacity="0.85" stroke-width="2"/>
+  <path d="M380 88L380 213" stroke="white" stroke-opacity="0.85" stroke-width="2"/>
+  <defs>
+    <linearGradient id="bg" x1="39" y1="46" x2="576" y2="383" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1B1256"/>
+      <stop offset="1" stop-color="#5C3EC7"/>
+    </linearGradient>
+  </defs>
+</svg>
