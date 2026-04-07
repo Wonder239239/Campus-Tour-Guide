@@ -4,11 +4,11 @@
   --panel-strong: #fff9f0;
   --text: #182126;
   --muted: #586269;
-  --brand: #0f766e;
-  --brand-dark: #11413e;
-  --accent: #eb5e28;
+  --brand: #a6192e;
+  --brand-dark: #6f1020;
+  --accent: #d4a017;
   --line: rgba(24, 33, 38, 0.12);
-  --shadow: 0 20px 45px rgba(17, 65, 62, 0.14);
+  --shadow: 0 20px 45px rgba(111, 16, 32, 0.16);
 }
 
 * {
@@ -21,9 +21,9 @@ body {
   font-family: "Noto Sans SC", sans-serif;
   color: var(--text);
   background:
-    radial-gradient(circle at top left, rgba(15, 118, 110, 0.16), transparent 28%),
-    radial-gradient(circle at bottom right, rgba(235, 94, 40, 0.18), transparent 22%),
-    linear-gradient(135deg, #f5efe1 0%, #efe7da 42%, #eceae2 100%);
+    radial-gradient(circle at top left, rgba(166, 25, 46, 0.18), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(212, 160, 23, 0.2), transparent 22%),
+    linear-gradient(135deg, #f7f1ed 0%, #efe1d8 42%, #ece9e4 100%);
 }
 
 button,
@@ -68,7 +68,7 @@ select {
   width: 220px;
   height: 220px;
   border-radius: 50%;
-  background: linear-gradient(180deg, rgba(235, 94, 40, 0.25), rgba(15, 118, 110, 0.12));
+  background: linear-gradient(180deg, rgba(212, 160, 23, 0.28), rgba(166, 25, 46, 0.12));
   filter: blur(4px);
 }
 
@@ -229,7 +229,7 @@ main {
 
 .legend-dot.library,
 .library-pin {
-  background: #0f766e;
+  background: #a6192e;
 }
 
 .map-stage {
@@ -237,10 +237,10 @@ main {
   overflow: hidden;
   border-radius: 22px;
   background:
-    linear-gradient(180deg, rgba(15, 118, 110, 0.08), rgba(255, 255, 255, 0.12)),
+    linear-gradient(180deg, rgba(166, 25, 46, 0.08), rgba(255, 255, 255, 0.12)),
     #fffdf6;
   min-height: 420px;
-  border: 1px solid rgba(17, 65, 62, 0.08);
+  border: 1px solid rgba(111, 16, 32, 0.08);
 }
 
 .campus-map {
@@ -278,7 +278,7 @@ main {
 .garden-pin {
   top: 61%;
   left: 36%;
-  background: #eb5e28;
+  background: #d4a017;
 }
 
 .hall-pin {
@@ -308,8 +308,8 @@ main {
 }
 
 .status-card.active {
-  border-color: rgba(15, 118, 110, 0.28);
-  background: rgba(15, 118, 110, 0.08);
+  border-color: rgba(166, 25, 46, 0.28);
+  background: rgba(166, 25, 46, 0.08);
 }
 
 .step-number {
@@ -333,8 +333,8 @@ main {
 }
 
 .prompt-card {
-  background: linear-gradient(135deg, rgba(15, 118, 110, 0.13), rgba(235, 94, 40, 0.12));
-  border: 1px solid rgba(15, 118, 110, 0.2);
+  background: linear-gradient(135deg, rgba(166, 25, 46, 0.13), rgba(212, 160, 23, 0.14));
+  border: 1px solid rgba(166, 25, 46, 0.2);
 }
 
 .subtle-row {
@@ -360,7 +360,7 @@ main {
 #cameraFeed {
   object-fit: cover;
   background:
-    radial-gradient(circle at top, rgba(15, 118, 110, 0.32), transparent 30%),
+    radial-gradient(circle at top, rgba(166, 25, 46, 0.32), transparent 30%),
     linear-gradient(180deg, #10252b, #05090b);
 }
 
