@@ -1,0 +1,25 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1600" height="900" fill="#FFF9EF"/>
+  <rect x="84" y="92" width="1432" height="716" rx="44" fill="#F4E8D8"/>
+  <path d="M215 231C355 173 528 161 668 208C798 251 867 360 997 395C1120 428 1267 385 1382 320" stroke="#D5C1A7" stroke-width="78" stroke-linecap="round"/>
+  <path d="M227 641C402 607 505 531 609 462C732 380 886 344 1046 392C1170 429 1282 518 1386 634" stroke="#D5C1A7" stroke-width="58" stroke-linecap="round"/>
+  <path d="M753 166V732" stroke="#E9DCC8" stroke-width="24" stroke-linecap="round"/>
+  <path d="M433 163V765" stroke="#E9DCC8" stroke-width="18" stroke-linecap="round"/>
+  <path d="M1116 171V732" stroke="#E9DCC8" stroke-width="18" stroke-linecap="round"/>
+  <rect x="801" y="206" width="286" height="174" rx="28" fill="#C1E8D9"/>
+  <rect x="284" y="302" width="224" height="136" rx="26" fill="#C5D8F5"/>
+  <rect x="476" y="546" width="312" height="172" rx="34" fill="#F7D1BC"/>
+  <rect x="1111" y="466" width="210" height="130" rx="24" fill="#E7E4DE"/>
+  <rect x="905" y="551" width="118" height="84" rx="20" fill="#E7E4DE"/>
+  <circle cx="679" cy="628" r="112" fill="#C6E2A6"/>
+  <circle cx="691" cy="624" r="70" fill="#A4CD74"/>
+  <circle cx="1248" cy="229" r="72" fill="#C6E2A6"/>
+  <circle cx="1248" cy="229" r="42" fill="#A4CD74"/>
+  <path d="M860 126C878 106 904 96 928 102C966 112 987 154 977 190C965 232 913 257 870 240C837 227 812 199 812 164C812 147 819 131 831 120" stroke="#8FC2AE" stroke-width="18" stroke-linecap="round"/>
+  <path d="M560 226H641" stroke="#FFFFFF" stroke-width="16" stroke-linecap="round"/>
+  <path d="M934 722H1134" stroke="#FFFFFF" stroke-width="16" stroke-linecap="round"/>
+  <path d="M1190 347H1300" stroke="#FFFFFF" stroke-width="16" stroke-linecap="round"/>
+  <text x="856" y="305" fill="#11413E" font-family="Arial, sans-serif" font-size="34" font-weight="700">Library</text>
+  <text x="330" y="382" fill="#2A456E" font-family="Arial, sans-serif" font-size="28" font-weight="700">Visitor Center</text>
+  <text x="548" y="644" fill="#8D3E20" font-family="Arial, sans-serif" font-size="32" font-weight="700">Central Lawn</text>
+</svg>
