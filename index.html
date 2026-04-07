@@ -90,22 +90,9 @@
             <div id="leafletMap" class="leaflet-map" aria-label="XJTLU live map"></div>
           </div>
 
-          <div class="status-stack">
-            <div class="status-card active">
-              <p class="step-number">01</p>
-              <div>
-                <h3 id="locateTitle">开始实时定位</h3>
-                <p id="locateBody">点击下方按钮后，网页会请求定位权限并检测你是否靠近景点。</p>
-              </div>
-            </div>
-            <div class="status-card">
-              <p class="step-number">02</p>
-              <div>
-                <h3 id="arrivalTitle">等待到达建筑</h3>
-                <p id="arrivalBody">当你到达西浦图书馆、西浦博物馆或南校区体育中心时，系统会自动跳转到 AR 讲解页面。</p>
-              </div>
-            </div>
-          </div>
+          <p class="map-status-line" id="mapStatusLine">
+            点击“启动实时定位”后，系统将获取当前位置并持续判断你与目标建筑的距离。
+          </p>
 
           <div class="button-row">
             <button class="primary-btn" id="startLocationBtn">开始实时定位</button>

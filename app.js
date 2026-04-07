@@ -21,10 +21,7 @@ const texts = {
     library: "西浦图书馆",
     garden: "西浦博物馆",
     hall: "南校区体育中心",
-    locateTitle: "定位服务待启动",
-    locateBody: "点击下方按钮后，系统将请求定位权限，并实时判断用户与目标建筑之间的距离。",
-    arrivalTitle: "等待到达目标建筑",
-    arrivalBody: "当用户进入西浦图书馆、西浦博物馆或南校区体育中心的识别范围时，系统将自动跳转到 AR 讲解页面。",
+    mapStatusLine: "点击“启动实时定位”后，系统将获取当前位置并持续判断你与目标建筑的距离。",
     startLocationBtn: "启动实时定位",
     demoArrivalBtn: "演示模式：直接进入 AR",
     cameraKicker: "AR Storytelling",
@@ -62,10 +59,7 @@ const texts = {
     library: "XJTLU Library",
     garden: "XJTLU Museum",
     hall: "South Campus Sports Centre",
-    locateTitle: "Positioning service pending",
-    locateBody: "Press the button below to request location permission. The system will then measure the distance between the user and the target building in real time.",
-    arrivalTitle: "Waiting to reach the target building",
-    arrivalBody: "When the user enters the recognition range of the Library, Museum, or South Campus Sports Centre, the system automatically jumps to the AR explanation page.",
+    mapStatusLine: "After starting live positioning, the system gets the current location and continuously evaluates your distance from the target building.",
     startLocationBtn: "Start Live Positioning",
     demoArrivalBtn: "Demo Mode: Enter AR Directly",
     cameraKicker: "AR Storytelling",
@@ -156,10 +150,7 @@ const elements = {
   startLocationBtn: document.getElementById("startLocationBtn"),
   demoArrivalBtn: document.getElementById("demoArrivalBtn"),
   leafletMap: document.getElementById("leafletMap"),
-  locateTitle: document.getElementById("locateTitle"),
-  locateBody: document.getElementById("locateBody"),
-  arrivalTitle: document.getElementById("arrivalTitle"),
-  arrivalBody: document.getElementById("arrivalBody"),
+  mapStatusLine: document.getElementById("mapStatusLine"),
   backToMapBtn: document.getElementById("backToMapBtn"),
   arrivalBanner: document.getElementById("arrivalBanner"),
   cameraFeed: document.getElementById("cameraFeed"),
@@ -188,10 +179,7 @@ const translatableIds = [
   "mapKicker",
   "mapTitle",
   "backToRoleBtn",
-  "locateTitle",
-  "locateBody",
-  "arrivalTitle",
-  "arrivalBody",
+  "mapStatusLine",
   "startLocationBtn",
   "demoArrivalBtn",
   "cameraKicker",
@@ -347,8 +335,7 @@ async function openArScreen(poi) {
 
 function handleArrival(poi) {
   state.activePoi = poi;
-  elements.arrivalTitle.textContent = getCopy().arrived(getCopy()[poi.nameKey]);
-  elements.arrivalBody.textContent = getCopy().arrived(getCopy()[poi.nameKey]);
+  elements.mapStatusLine.textContent = getCopy().arrived(getCopy()[poi.nameKey]);
   setTimeout(() => {
     openArScreen(poi);
   }, 900);
@@ -357,8 +344,7 @@ function handleArrival(poi) {
 function handleLocationSuccess(position) {
   const t = getCopy();
   const nearest = findNearestPoi(position.coords);
-  elements.locateTitle.textContent = t.locating;
-  elements.locateBody.textContent = `${position.coords.latitude.toFixed(5)}, ${position.coords.longitude.toFixed(5)}`;
+  elements.mapStatusLine.textContent = `${t.locating} ${position.coords.latitude.toFixed(5)}, ${position.coords.longitude.toFixed(5)}`;
 
   const latLng = [position.coords.latitude, position.coords.longitude];
   if (!userMarker) {
@@ -378,23 +364,19 @@ function handleLocationSuccess(position) {
     handleArrival(nearest.poi);
   } else {
     state.activePoi = nearest.poi;
-    elements.arrivalTitle.textContent =
-      state.language === "zh" ? `最近建筑：${t[nearest.poi.nameKey]}` : `Nearest building: ${t[nearest.poi.nameKey]}`;
-    elements.arrivalBody.textContent = t.noNearby(t[nearest.poi.nameKey], nearest.distance);
+    elements.mapStatusLine.textContent = t.noNearby(t[nearest.poi.nameKey], nearest.distance);
     elements.demoArrivalBtn.classList.remove("hidden");
   }
 }
 
 function handleLocationError() {
-  elements.locateTitle.textContent = getCopy().locationDenied;
-  elements.locateBody.textContent = getCopy().requestingLocation;
+  elements.mapStatusLine.textContent = getCopy().locationDenied;
   elements.demoArrivalBtn.classList.remove("hidden");
 }
 
 function requestLocation() {
   renderMap();
-  elements.locateTitle.textContent = getCopy().requestingLocation;
-  elements.locateBody.textContent = getCopy().locateBody;
+  elements.mapStatusLine.textContent = getCopy().requestingLocation;
   elements.demoArrivalBtn.classList.add("hidden");
 
   if (!navigator.geolocation) {

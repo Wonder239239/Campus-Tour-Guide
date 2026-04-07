@@ -277,36 +277,16 @@ select {
 }
 
 
-.status-stack {
-  display: grid;
-  gap: 16px;
-}
-
-.status-card,
 .narration-card,
 .arrival-banner {
   border-radius: 24px;
   padding: 20px;
 }
 
-.status-card {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 18px;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.step-number {
-  min-width: 52px;
-  height: 52px;
-  border-radius: 18px;
-  display: grid;
-  place-items: center;
-  background: rgba(255, 255, 255, 0.14);
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 1.1rem;
-  font-weight: 700;
+.map-status-line {
+  margin: 2px 0 0;
+  color: var(--muted);
+  line-height: 1.7;
 }
 
 .arrival-banner {
