@@ -30,7 +30,6 @@ const texts = {
     narrationLabel: "Audio Guide",
     playAudioBtn: "重新播放讲解",
     stopAudioBtn: "停止讲解",
-    enableMotionBtn: "开启体感",
     motionStatus: "体感控制未开启。",
     motionEnabled: "体感控制已开启，虚拟人会跟随手机轻微倾斜。",
     motionDenied: "设备未授予体感权限，无法启用倾斜跟随。",
@@ -79,7 +78,6 @@ const texts = {
     narrationLabel: "Audio Guide",
     playAudioBtn: "Replay Narration",
     stopAudioBtn: "Stop Narration",
-    enableMotionBtn: "Enable Motion",
     motionStatus: "Motion control is off.",
     motionEnabled: "Motion control is enabled. The virtual guide now tilts gently with your phone.",
     motionDenied: "Motion permission was not granted, so tilt-follow cannot be enabled.",
@@ -182,7 +180,6 @@ const elements = {
   ocrStatus: document.getElementById("ocrStatus"),
   playAudioBtn: document.getElementById("playAudioBtn"),
   stopAudioBtn: document.getElementById("stopAudioBtn"),
-  enableMotionBtn: document.getElementById("enableMotionBtn"),
   motionStatus: document.getElementById("motionStatus")
 };
 
@@ -218,7 +215,6 @@ const translatableIds = [
   "ocrStatus",
   "playAudioBtn",
   "stopAudioBtn",
-  "enableMotionBtn",
   "motionStatus"
 ];
 
@@ -381,6 +377,7 @@ async function openArScreen(poi) {
   state.activePoi = poi;
   updateNarration();
   showScreen(elements.arScreen);
+  enableMotionControl();
   speakNarration();
 }
 
@@ -525,7 +522,6 @@ elements.signImageInput.addEventListener("change", async (event) => {
 });
 elements.playAudioBtn.addEventListener("click", speakNarration);
 elements.stopAudioBtn.addEventListener("click", () => window.speechSynthesis.cancel());
-elements.enableMotionBtn.addEventListener("click", enableMotionControl);
 elements.backToMapBtn.addEventListener("click", () => {
   window.speechSynthesis.cancel();
   showScreen(elements.mapScreen);
