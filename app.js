@@ -400,19 +400,16 @@ function handleLocationSuccess(position) {
   } else {
     state.activePoi = nearest.poi;
     elements.mapStatusLine.textContent = t.noNearby(t[nearest.poi.nameKey], nearest.distance);
-    elements.demoArrivalBtn.classList.remove("hidden");
   }
 }
 
 function handleLocationError() {
   elements.mapStatusLine.textContent = getCopy().locationDenied;
-  elements.demoArrivalBtn.classList.remove("hidden");
 }
 
 function requestLocation() {
   renderMap();
   elements.mapStatusLine.textContent = getCopy().requestingLocation;
-  elements.demoArrivalBtn.classList.add("hidden");
 
   if (!navigator.geolocation) {
     handleLocationError();
