@@ -25,17 +25,23 @@ const texts = {
     startLocationBtn: "启动实时定位",
     demoArrivalBtn: "演示模式：直接进入 AR",
     cameraKicker: "AR Storytelling",
-    cameraTitle: "AR 建筑讲解页面",
+    cameraTitle: "虚拟讲解页面",
     backToMapBtn: "返回地图定位页",
     narrationLabel: "Audio Guide",
     playAudioBtn: "重新播放讲解",
     stopAudioBtn: "停止讲解",
+    scanKicker: "OCR Trigger",
+    scanTitle: "扫描建筑标示牌",
+    scanSignBtn: "扫描标示牌",
+    ocrStatus: "点击下方按钮拍摄或上传建筑标示牌图片。系统会通过 OCR 识别文字，并触发对应建筑的讲解动画。",
+    ocrProcessing: "正在识别标示牌文字，请稍候。",
+    ocrNoMatch: "未识别到可匹配的建筑名称。请尽量让标示牌文字更清晰。",
+    ocrMatched: (name) => `OCR 识别成功，已匹配到${name}，正在切换对应讲解与动画。`,
     requestingLocation: "正在请求定位权限，请允许浏览器访问当前设备位置。",
     locating: "定位成功，系统正在判断你是否已进入目标建筑识别范围。",
     noNearby: (name, meters) => `当前距离 ${name} 约 ${meters} 米。请继续靠近目标建筑，或使用演示模式直接进入 AR 页面。`,
     arrived: (name) => `识别成功：你已到达${name}，系统正在打开 AR 讲解页面。`,
-    locationDenied: "未获取到定位权限。请在浏览器中允许定位访问后重试，或使用演示模式继续展示。",
-    cameraDenied: "相机暂未成功开启，当前将显示演示背景，但虚拟讲解员与语音讲解仍可继续播放。"
+    locationDenied: "未获取到定位权限。请在浏览器中允许定位访问后重试，或使用演示模式继续展示。"
   },
   en: {
     heroTag: "XJTLU Campus Guide",
@@ -63,17 +69,24 @@ const texts = {
     startLocationBtn: "Start Live Positioning",
     demoArrivalBtn: "Demo Mode: Enter AR Directly",
     cameraKicker: "AR Storytelling",
-    cameraTitle: "AR Building Explanation Page",
+    cameraTitle: "Virtual Guide Explanation Page",
     backToMapBtn: "Back To Positioning Page",
     narrationLabel: "Audio Guide",
     playAudioBtn: "Replay Narration",
     stopAudioBtn: "Stop Narration",
+    scanKicker: "OCR Trigger",
+    scanTitle: "Scan Building Sign",
+    scanSignBtn: "Scan Sign",
+    ocrStatus:
+      "Tap the button below to capture or upload a building sign image. OCR text recognition will trigger the matching building explanation animation.",
+    ocrProcessing: "Recognizing sign text. Please wait.",
+    ocrNoMatch: "No matching building name was recognized. Try to make the sign text clearer.",
+    ocrMatched: (name) => `OCR matched ${name}. Switching to the corresponding explanation and animation.`,
     requestingLocation: "Requesting location permission. Please allow the browser to access the current device position.",
     locating: "Location received. The system is checking whether you have entered the recognition range of the target building.",
     noNearby: (name, meters) => `You are about ${meters} meters away from ${name}. Please continue approaching the target building, or use demo mode to enter the AR page directly.`,
     arrived: (name) => `Recognition successful: you have arrived at ${name}. The system is now opening the AR explanation page.`,
-    locationDenied: "Location permission was not granted. Please allow location access in the browser and try again, or use demo mode to continue the presentation.",
-    cameraDenied: "The camera could not be started. A fallback background will be shown, while the virtual presenter and narration remain available."
+    locationDenied: "Location permission was not granted. Please allow location access in the browser and try again, or use demo mode to continue the presentation."
   }
 };
 
@@ -153,9 +166,13 @@ const elements = {
   mapStatusLine: document.getElementById("mapStatusLine"),
   backToMapBtn: document.getElementById("backToMapBtn"),
   arrivalBanner: document.getElementById("arrivalBanner"),
-  cameraFeed: document.getElementById("cameraFeed"),
+  avatarCard: document.getElementById("avatarCard"),
+  avatarViewer: document.getElementById("avatarViewer"),
   narrationTitle: document.getElementById("narrationTitle"),
   narrationBody: document.getElementById("narrationBody"),
+  scanSignBtn: document.getElementById("scanSignBtn"),
+  signImageInput: document.getElementById("signImageInput"),
+  ocrStatus: document.getElementById("ocrStatus"),
   playAudioBtn: document.getElementById("playAudioBtn"),
   stopAudioBtn: document.getElementById("stopAudioBtn")
 };
@@ -186,6 +203,10 @@ const translatableIds = [
   "cameraTitle",
   "backToMapBtn",
   "narrationLabel",
+  "scanKicker",
+  "scanTitle",
+  "scanSignBtn",
+  "ocrStatus",
   "playAudioBtn",
   "stopAudioBtn"
 ];
@@ -212,6 +233,12 @@ function updateNarration() {
   elements.narrationTitle.textContent = content.title;
   elements.narrationBody.textContent = content.body;
   elements.arrivalBanner.textContent = getCopy().arrived(getCopy()[state.activePoi.nameKey]);
+  updateAvatarMode();
+}
+
+function updateAvatarMode() {
+  elements.avatarCard.classList.remove("avatar-library", "avatar-garden", "avatar-hall");
+  elements.avatarCard.classList.add(`avatar-${state.activePoi.id}`);
 }
 
 function applyTranslations() {
@@ -234,6 +261,7 @@ function applyTranslations() {
   elements.studentChip.textContent = t.student;
   elements.visitorChip.textContent = t.visitor;
   elements.selectionHint.textContent = state.role ? t.roleReady(state.role) : t.selectionHint;
+  elements.ocrStatus.textContent = t.ocrStatus;
   updateNarration();
 }
 
@@ -288,34 +316,6 @@ function findNearestPoi(position) {
     .sort((a, b) => a.distance - b.distance)[0];
 }
 
-async function startCameraFeed() {
-  if (!navigator.mediaDevices?.getUserMedia) {
-    elements.arrivalBanner.textContent = getCopy().cameraDenied;
-    return;
-  }
-
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { ideal: "environment" } },
-      audio: false
-    });
-    state.currentStream = stream;
-    elements.cameraFeed.srcObject = stream;
-  } catch {
-    elements.cameraFeed.srcObject = null;
-    elements.arrivalBanner.textContent = getCopy().cameraDenied;
-  }
-}
-
-function stopCameraFeed() {
-  if (!state.currentStream) {
-    return;
-  }
-  state.currentStream.getTracks().forEach((track) => track.stop());
-  state.currentStream = null;
-  elements.cameraFeed.srcObject = null;
-}
-
 function speakNarration() {
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(getPoiNarration().speech(state.role));
@@ -329,7 +329,51 @@ async function openArScreen(poi) {
   state.activePoi = poi;
   updateNarration();
   showScreen(elements.arScreen);
-  await startCameraFeed();
+  speakNarration();
+}
+
+function matchPoiFromText(rawText) {
+  const text = rawText.toLowerCase().replace(/\s+/g, " ");
+  const matchers = [
+    { poi: pois[0], keywords: ["library", "xjtlu library", "图书馆", "西浦图书馆"] },
+    { poi: pois[1], keywords: ["museum", "xjtlu museum", "博物馆", "西浦博物馆"] },
+    { poi: pois[2], keywords: ["sports centre", "sports center", "sports", "体育中心", "南校区体育中心"] }
+  ];
+
+  return matchers.find((entry) => entry.keywords.some((keyword) => text.includes(keyword)))?.poi || null;
+}
+
+async function runOcrOnImage(file) {
+  const t = getCopy();
+  elements.ocrStatus.textContent = t.ocrProcessing;
+
+  const lang = state.language === "zh" ? "eng+chi_sim" : "eng";
+  let text = "";
+
+  if (window.Tesseract?.recognize) {
+    const result = await window.Tesseract.recognize(file, lang, {
+      logger: (message) => {
+        if (message.status === "recognizing text" && typeof message.progress === "number") {
+          elements.ocrStatus.textContent = `${t.ocrProcessing} ${Math.round(message.progress * 100)}%`;
+        }
+      }
+    });
+    text = result.data.text || "";
+  } else {
+    elements.ocrStatus.textContent = t.ocrNoMatch;
+    return;
+  }
+
+  const matchedPoi = matchPoiFromText(text);
+  if (!matchedPoi) {
+    elements.ocrStatus.textContent = `${t.ocrNoMatch} OCR: ${text.trim().slice(0, 80) || "N/A"}`;
+    return;
+  }
+
+  state.activePoi = matchedPoi;
+  updateNarration();
+  elements.ocrStatus.textContent = t.ocrMatched(getCopy()[matchedPoi.nameKey]);
+  elements.arrivalBanner.textContent = t.ocrMatched(getCopy()[matchedPoi.nameKey]);
   speakNarration();
 }
 
@@ -422,11 +466,19 @@ elements.goMapBtn.addEventListener("click", () => {
 elements.backToRoleBtn.addEventListener("click", () => showScreen(elements.roleScreen));
 elements.startLocationBtn.addEventListener("click", requestLocation);
 elements.demoArrivalBtn.addEventListener("click", () => openArScreen(state.activePoi));
+elements.scanSignBtn.addEventListener("click", () => elements.signImageInput.click());
+elements.signImageInput.addEventListener("change", async (event) => {
+  const [file] = event.target.files || [];
+  if (!file) {
+    return;
+  }
+  await runOcrOnImage(file);
+  event.target.value = "";
+});
 elements.playAudioBtn.addEventListener("click", speakNarration);
 elements.stopAudioBtn.addEventListener("click", () => window.speechSynthesis.cancel());
 elements.backToMapBtn.addEventListener("click", () => {
   window.speechSynthesis.cancel();
-  stopCameraFeed();
   showScreen(elements.mapScreen);
   renderMap();
 });

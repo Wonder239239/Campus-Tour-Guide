@@ -308,38 +308,32 @@ select {
   border: 1px solid rgba(255, 255, 255, 0.14);
 }
 
-.camera-stage {
+.guide-stage {
   position: relative;
   min-height: 68vh;
   border-radius: 28px;
   overflow: hidden;
-  background: #091318;
+  background:
+    radial-gradient(circle at top left, rgba(141, 107, 255, 0.22), transparent 28%),
+    linear-gradient(180deg, rgba(17, 9, 48, 0.96), rgba(10, 7, 28, 0.98));
 }
 
-#cameraFeed,
-.camera-overlay {
+.guide-backdrop {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
 }
 
-#cameraFeed {
-  object-fit: cover;
+.guide-backdrop {
   background:
-    radial-gradient(circle at top, rgba(166, 25, 46, 0.32), transparent 30%),
-    linear-gradient(180deg, #10252b, #05090b);
-}
-
-.camera-overlay {
-  background:
-    linear-gradient(180deg, rgba(8, 14, 18, 0.08), rgba(8, 14, 18, 0.72)),
+    radial-gradient(circle at center, rgba(255, 255, 255, 0.06), transparent 36%),
     repeating-linear-gradient(
       90deg,
-      rgba(255, 255, 255, 0.03) 0,
-      rgba(255, 255, 255, 0.03) 1px,
+      rgba(255, 255, 255, 0.025) 0,
+      rgba(255, 255, 255, 0.025) 1px,
       transparent 1px,
-      transparent 80px
+      transparent 72px
     );
 }
 
@@ -350,8 +344,8 @@ select {
 }
 
 .avatar-card {
-  left: 5%;
-  bottom: 5%;
+  left: 7%;
+  bottom: 7%;
   width: min(28vw, 260px);
   height: min(42vh, 320px);
   border-radius: 22px;
@@ -359,6 +353,18 @@ select {
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(2px);
+}
+
+.avatar-card.avatar-library {
+  animation: avatarFloat 4s ease-in-out infinite;
+}
+
+.avatar-card.avatar-garden {
+  animation: avatarSway 3.6s ease-in-out infinite;
+}
+
+.avatar-card.avatar-hall {
+  animation: avatarBounce 2.4s ease-in-out infinite;
 }
 
 model-viewer {
@@ -378,8 +384,58 @@ model-viewer {
   box-shadow: 0 18px 32px rgba(0, 0, 0, 0.2);
 }
 
+.scan-panel {
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.scan-title {
+  margin-top: 4px;
+  font-size: 1.2rem;
+}
+
+.scan-text {
+  margin-top: 8px;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
 .hidden {
   display: none !important;
+}
+
+@keyframes avatarFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes avatarSway {
+  0%,
+  100% {
+    transform: rotate(-1.5deg) translateY(0);
+  }
+  50% {
+    transform: rotate(1.5deg) translateY(-6px);
+  }
+}
+
+@keyframes avatarBounce {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-12px) scale(1.03);
+  }
 }
 
 @media (max-width: 920px) {
@@ -387,7 +443,7 @@ model-viewer {
     grid-template-columns: 1fr;
   }
 
-  .camera-stage {
+  .guide-stage {
     min-height: 780px;
   }
 
@@ -437,7 +493,7 @@ model-viewer {
     min-height: 320px;
   }
 
-  .camera-stage {
+  .guide-stage {
     min-height: 700px;
   }
 

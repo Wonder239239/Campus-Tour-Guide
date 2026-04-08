@@ -106,7 +106,7 @@
           <div class="camera-header">
             <div>
               <p class="section-kicker" id="cameraKicker">AR Storytelling</p>
-              <h2 id="cameraTitle">AR Building Explanation Page</h2>
+              <h2 id="cameraTitle">Virtual Guide Explanation Page</h2>
             </div>
             <button class="ghost-btn" id="backToMapBtn">Back To Positioning Page</button>
           </div>
@@ -115,11 +115,11 @@
             Recognition successful: you have arrived at XJTLU Library. The system is now opening the AR explanation page.
           </div>
 
-          <div class="camera-stage">
-            <video id="cameraFeed" autoplay playsinline muted></video>
-            <div class="camera-overlay"></div>
-            <div class="avatar-card">
+          <div class="guide-stage">
+            <div class="guide-backdrop"></div>
+            <div class="avatar-card" id="avatarCard">
               <model-viewer
+                id="avatarViewer"
                 src="https://modelviewer.dev/shared-assets/models/Astronaut.glb"
                 camera-controls
                 auto-rotate
@@ -140,6 +140,26 @@
               </div>
             </div>
           </div>
+
+          <div class="scan-panel">
+            <div>
+              <p class="eyebrow" id="scanKicker">OCR Trigger</p>
+              <h3 class="scan-title" id="scanTitle">Scan Building Sign</h3>
+              <p class="scan-text" id="ocrStatus">
+                Tap the button below to scan a building sign. OCR text recognition will trigger the matching explanation animation.
+              </p>
+            </div>
+            <div class="button-row">
+              <button class="primary-btn compact-btn" id="scanSignBtn">Scan Sign</button>
+            </div>
+            <input
+              type="file"
+              id="signImageInput"
+              class="hidden"
+              accept="image/*"
+              capture="environment"
+            />
+          </div>
         </div>
       </section>
     </div>
@@ -149,6 +169,7 @@
       integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
       crossorigin=""
     ></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script src="./app.js"></script>
   </body>
 </html>
