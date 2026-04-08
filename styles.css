@@ -337,18 +337,18 @@ select {
     );
 }
 
-.avatar-card,
-.narration-card {
+.avatar-card {
   position: absolute;
   z-index: 1;
 }
 
 .avatar-card {
-  left: 7%;
-  bottom: 7%;
-  width: min(28vw, 260px);
-  height: min(42vh, 320px);
-  border-radius: 22px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(44vw, 420px);
+  height: min(58vh, 500px);
+  border-radius: 28px;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -376,12 +376,16 @@ model-viewer {
 }
 
 .narration-card {
-  right: 5%;
-  bottom: 6%;
-  width: min(36vw, 380px);
   background: rgba(23, 15, 60, 0.84);
   border: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow: 0 18px 32px rgba(0, 0, 0, 0.2);
+}
+
+.centered-narration {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 760px);
+  margin: -24px auto 0;
 }
 
 .scan-panel {
@@ -411,30 +415,30 @@ model-viewer {
 @keyframes avatarFloat {
   0%,
   100% {
-    transform: translateY(0);
+    transform: translate(-50%, -50%);
   }
   50% {
-    transform: translateY(-10px);
+    transform: translate(-50%, calc(-50% - 10px));
   }
 }
 
 @keyframes avatarSway {
   0%,
   100% {
-    transform: rotate(-1.5deg) translateY(0);
+    transform: translate(-50%, -50%) rotate(-1.5deg);
   }
   50% {
-    transform: rotate(1.5deg) translateY(-6px);
+    transform: translate(-50%, calc(-50% - 6px)) rotate(1.5deg);
   }
 }
 
 @keyframes avatarBounce {
   0%,
   100% {
-    transform: translateY(0) scale(1);
+    transform: translate(-50%, -50%) scale(1);
   }
   50% {
-    transform: translateY(-12px) scale(1.03);
+    transform: translate(-50%, calc(-50% - 12px)) scale(1.03);
   }
 }
 
@@ -448,17 +452,8 @@ model-viewer {
   }
 
   .avatar-card {
-    left: 24px;
-    width: min(36vw, 200px);
-    height: 240px;
-    bottom: 200px;
-  }
-
-  .narration-card {
-    left: 24px;
-    right: 24px;
-    width: auto;
-    bottom: 24px;
+    width: min(56vw, 320px);
+    height: 360px;
   }
 }
 
@@ -494,23 +489,20 @@ model-viewer {
   }
 
   .guide-stage {
-    min-height: 700px;
+    min-height: 560px;
   }
 
   .avatar-card {
-    left: 16px;
-    width: 150px;
-    height: 190px;
-    bottom: 188px;
-    border-radius: 18px;
+    width: min(72vw, 280px);
+    height: 320px;
+    border-radius: 22px;
     background: rgba(255, 255, 255, 0.01);
     border: 1px solid rgba(255, 255, 255, 0.04);
     backdrop-filter: none;
   }
 
-  .narration-card {
-    left: 16px;
-    right: 16px;
-    bottom: 16px;
+  .centered-narration {
+    width: 100%;
+    margin-top: -8px;
   }
 }
