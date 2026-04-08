@@ -30,6 +30,11 @@ const texts = {
     narrationLabel: "Audio Guide",
     playAudioBtn: "重新播放讲解",
     stopAudioBtn: "停止讲解",
+    enableMotionBtn: "开启体感",
+    motionStatus: "体感控制未开启。",
+    motionEnabled: "体感控制已开启，虚拟人会跟随手机轻微倾斜。",
+    motionDenied: "设备未授予体感权限，无法启用倾斜跟随。",
+    motionUnsupported: "当前设备或浏览器不支持体感倾斜控制。",
     scanKicker: "OCR Trigger",
     scanTitle: "扫描建筑标示牌",
     scanSignBtn: "扫描标示牌",
@@ -74,6 +79,11 @@ const texts = {
     narrationLabel: "Audio Guide",
     playAudioBtn: "Replay Narration",
     stopAudioBtn: "Stop Narration",
+    enableMotionBtn: "Enable Motion",
+    motionStatus: "Motion control is off.",
+    motionEnabled: "Motion control is enabled. The virtual guide now tilts gently with your phone.",
+    motionDenied: "Motion permission was not granted, so tilt-follow cannot be enabled.",
+    motionUnsupported: "This device or browser does not support motion-based tilt control.",
     scanKicker: "OCR Trigger",
     scanTitle: "Scan Building Sign",
     scanSignBtn: "Scan Sign",
@@ -171,12 +181,15 @@ const elements = {
   signImageInput: document.getElementById("signImageInput"),
   ocrStatus: document.getElementById("ocrStatus"),
   playAudioBtn: document.getElementById("playAudioBtn"),
-  stopAudioBtn: document.getElementById("stopAudioBtn")
+  stopAudioBtn: document.getElementById("stopAudioBtn"),
+  enableMotionBtn: document.getElementById("enableMotionBtn"),
+  motionStatus: document.getElementById("motionStatus")
 };
 
 let map;
 let userMarker;
 let watchId = null;
+let motionEnabled = false;
 
 const translatableIds = [
   "heroTag",
@@ -204,7 +217,9 @@ const translatableIds = [
   "scanSignBtn",
   "ocrStatus",
   "playAudioBtn",
-  "stopAudioBtn"
+  "stopAudioBtn",
+  "enableMotionBtn",
+  "motionStatus"
 ];
 
 function showScreen(screen) {
@@ -233,6 +248,50 @@ function updateAvatarMode() {
   elements.avatarCard.classList.add(`avatar-${state.activePoi.id}`);
 }
 
+function applyTilt(beta = 0, gamma = 0) {
+  const clampedGamma = Math.max(-18, Math.min(18, gamma));
+  const clampedBeta = Math.max(-18, Math.min(18, beta - 45));
+  elements.avatarCard.style.transform =
+    `translate(-50%, -50%) rotateY(${(clampedGamma / 18) * 10}deg) rotateX(${(-clampedBeta / 18) * 8}deg)`;
+}
+
+function handleDeviceOrientation(event) {
+  if (!motionEnabled) {
+    return;
+  }
+  applyTilt(event.beta ?? 0, event.gamma ?? 0);
+}
+
+async function enableMotionControl() {
+  const t = getCopy();
+
+  if (typeof window === "undefined" || typeof window.DeviceOrientationEvent === "undefined") {
+    elements.motionStatus.textContent = t.motionUnsupported;
+    return;
+  }
+
+  try {
+    if (typeof DeviceOrientationEvent.requestPermission === "function") {
+      const result = await DeviceOrientationEvent.requestPermission();
+      if (result !== "granted") {
+        elements.motionStatus.textContent = t.motionDenied;
+        return;
+      }
+    }
+
+    if (!motionEnabled) {
+      window.addEventListener("deviceorientation", handleDeviceOrientation, true);
+      motionEnabled = true;
+    }
+
+    elements.avatarCard.classList.add("motion-active");
+    applyTilt(0, 0);
+    elements.motionStatus.textContent = t.motionEnabled;
+  } catch {
+    elements.motionStatus.textContent = t.motionDenied;
+  }
+}
+
 function applyTranslations() {
   const t = getCopy();
   document.documentElement.lang = state.language === "zh" ? "zh-CN" : "en";
@@ -254,6 +313,7 @@ function applyTranslations() {
   elements.visitorChip.textContent = t.visitor;
   elements.selectionHint.textContent = state.role ? t.roleReady(state.role) : t.selectionHint;
   elements.ocrStatus.textContent = t.ocrStatus;
+  elements.motionStatus.textContent = motionEnabled ? t.motionEnabled : t.motionStatus;
   updateNarration();
 }
 
@@ -465,6 +525,7 @@ elements.signImageInput.addEventListener("change", async (event) => {
 });
 elements.playAudioBtn.addEventListener("click", speakNarration);
 elements.stopAudioBtn.addEventListener("click", () => window.speechSynthesis.cancel());
+elements.enableMotionBtn.addEventListener("click", enableMotionControl);
 elements.backToMapBtn.addEventListener("click", () => {
   window.speechSynthesis.cancel();
   showScreen(elements.mapScreen);
