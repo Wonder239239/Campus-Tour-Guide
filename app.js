@@ -36,7 +36,9 @@ const texts = {
     scanKicker: "OCR Trigger",
     scanTitle: "扫描建筑标示牌",
     scanSignBtn: "扫描标示牌",
-    ocrStatus: "点击下方按钮拍摄或上传建筑标示牌图片。系统会通过 OCR 识别文字，并触发对应建筑的讲解动画。",
+    ocrStatus: "点击下方按钮打开扫描模式。系统会通过 OCR 自动识别标示牌文字，并触发对应建筑的讲解动画。",
+    scanOverlayText: "请将建筑标示牌置于扫描框内，系统会自动进行 OCR 识别。",
+    closeScanBtn: "关闭扫描",
     ocrProcessing: "正在识别标示牌文字，请稍候。",
     ocrNoMatch: "未识别到可匹配的建筑名称。请尽量让标示牌文字更清晰。",
     ocrMatched: (name) => `OCR 识别成功，已匹配到${name}，正在切换对应讲解与动画。`,
@@ -84,7 +86,9 @@ const texts = {
     scanTitle: "Scan Building Sign",
     scanSignBtn: "Scan Sign",
     ocrStatus:
-      "Tap the button below to capture or upload a building sign image. OCR text recognition will trigger the matching building explanation animation.",
+      "Tap the button below to open scan mode. OCR text recognition runs automatically and triggers the matching building explanation animation.",
+    scanOverlayText: "Align the building sign inside the frame. OCR scanning runs automatically.",
+    closeScanBtn: "Close Scan",
     ocrProcessing: "Recognizing sign text. Please wait.",
     ocrNoMatch: "No matching building name was recognized. Try to make the sign text clearer.",
     ocrMatched: (name) => `OCR matched ${name}. Switching to the corresponding explanation and animation.`,
@@ -174,8 +178,12 @@ const elements = {
   avatarCard: document.getElementById("avatarCard"),
   avatarViewer: document.getElementById("avatarViewer"),
   scanSignBtn: document.getElementById("scanSignBtn"),
-  signImageInput: document.getElementById("signImageInput"),
   ocrStatus: document.getElementById("ocrStatus"),
+  scanOverlay: document.getElementById("scanOverlay"),
+  scanVideo: document.getElementById("scanVideo"),
+  scanCanvas: document.getElementById("scanCanvas"),
+  scanOverlayText: document.getElementById("scanOverlayText"),
+  closeScanBtn: document.getElementById("closeScanBtn"),
   playAudioBtn: document.getElementById("playAudioBtn"),
   stopAudioBtn: document.getElementById("stopAudioBtn")
 };
@@ -184,6 +192,9 @@ let map;
 let userMarker;
 let watchId = null;
 let motionEnabled = false;
+let scanStream = null;
+let scanIntervalId = null;
+let scanBusy = false;
 
 const translatableIds = [
   "heroTag",
@@ -209,6 +220,8 @@ const translatableIds = [
   "scanKicker",
   "scanTitle",
   "scanSignBtn",
+  "scanOverlayText",
+  "closeScanBtn",
   "ocrStatus",
   "playAudioBtn",
   "stopAudioBtn"
@@ -417,6 +430,91 @@ async function runOcrOnImage(file) {
   speakNarration();
 }
 
+async function runOcrOnCanvas() {
+  if (scanBusy || !window.Tesseract?.recognize) {
+    return;
+  }
+
+  const { videoWidth, videoHeight } = elements.scanVideo;
+  if (!videoWidth || !videoHeight) {
+    return;
+  }
+
+  scanBusy = true;
+  const t = getCopy();
+  elements.ocrStatus.textContent = t.ocrProcessing;
+
+  const canvas = elements.scanCanvas;
+  const ctx = canvas.getContext("2d");
+  const cropWidth = Math.round(videoWidth * 0.72);
+  const cropHeight = Math.round(videoHeight * 0.18);
+  const sx = Math.round((videoWidth - cropWidth) / 2);
+  const sy = Math.round((videoHeight - cropHeight) / 2);
+
+  canvas.width = cropWidth;
+  canvas.height = cropHeight;
+  ctx.drawImage(elements.scanVideo, sx, sy, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+
+  try {
+    const lang = state.language === "zh" ? "eng+chi_sim" : "eng";
+    const result = await window.Tesseract.recognize(canvas, lang);
+    const text = result.data.text || "";
+    const matchedPoi = matchPoiFromText(text);
+
+    if (matchedPoi) {
+      state.activePoi = matchedPoi;
+      updateNarration();
+      elements.ocrStatus.textContent = t.ocrMatched(getCopy()[matchedPoi.nameKey]);
+      closeScanOverlay();
+      speakNarration();
+    }
+  } finally {
+    scanBusy = false;
+  }
+}
+
+async function openScanOverlay() {
+  const t = getCopy();
+  if (!navigator.mediaDevices?.getUserMedia) {
+    elements.ocrStatus.textContent = t.ocrNoMatch;
+    return;
+  }
+
+  try {
+    scanStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: "environment" } },
+      audio: false
+    });
+
+    elements.scanVideo.srcObject = scanStream;
+    elements.scanOverlay.classList.remove("hidden");
+    elements.scanOverlayText.textContent = t.scanOverlayText;
+
+    if (scanIntervalId) {
+      clearInterval(scanIntervalId);
+    }
+
+    scanIntervalId = window.setInterval(runOcrOnCanvas, 1800);
+  } catch {
+    elements.ocrStatus.textContent = t.ocrNoMatch;
+  }
+}
+
+function closeScanOverlay() {
+  if (scanIntervalId) {
+    clearInterval(scanIntervalId);
+    scanIntervalId = null;
+  }
+
+  if (scanStream) {
+    scanStream.getTracks().forEach((track) => track.stop());
+    scanStream = null;
+  }
+
+  elements.scanVideo.srcObject = null;
+  elements.scanOverlay.classList.add("hidden");
+}
+
 function handleArrival(poi) {
   state.activePoi = poi;
   elements.mapStatusLine.textContent = getCopy().arrived(getCopy()[poi.nameKey]);
@@ -503,19 +601,13 @@ elements.goMapBtn.addEventListener("click", () => {
 elements.backToRoleBtn.addEventListener("click", () => showScreen(elements.roleScreen));
 elements.startLocationBtn.addEventListener("click", requestLocation);
 elements.demoArrivalBtn.addEventListener("click", () => openArScreen(state.activePoi));
-elements.scanSignBtn.addEventListener("click", () => elements.signImageInput.click());
-elements.signImageInput.addEventListener("change", async (event) => {
-  const [file] = event.target.files || [];
-  if (!file) {
-    return;
-  }
-  await runOcrOnImage(file);
-  event.target.value = "";
-});
+elements.scanSignBtn.addEventListener("click", openScanOverlay);
+elements.closeScanBtn.addEventListener("click", closeScanOverlay);
 elements.playAudioBtn.addEventListener("click", speakNarration);
 elements.stopAudioBtn.addEventListener("click", () => window.speechSynthesis.cancel());
 elements.backToMapBtn.addEventListener("click", () => {
   window.speechSynthesis.cancel();
+  closeScanOverlay();
   showScreen(elements.mapScreen);
   renderMap();
 });

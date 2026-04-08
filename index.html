@@ -144,16 +144,25 @@
             <div class="button-row">
               <button class="primary-btn compact-btn" id="scanSignBtn">Scan Sign</button>
             </div>
-            <input
-              type="file"
-              id="signImageInput"
-              class="hidden"
-              accept="image/*"
-              capture="environment"
-            />
           </div>
         </div>
       </section>
+    </div>
+
+    <div class="scan-overlay hidden" id="scanOverlay">
+      <div class="scan-shell">
+        <div class="scan-camera-wrap">
+          <video id="scanVideo" autoplay playsinline muted></video>
+          <div class="scan-frame"></div>
+        </div>
+        <div class="scan-overlay-bar">
+          <p class="scan-overlay-text" id="scanOverlayText">
+            Align the building sign inside the frame. OCR scanning runs automatically.
+          </p>
+          <button class="ghost-btn compact-btn" id="closeScanBtn">Close Scan</button>
+        </div>
+      </div>
+      <canvas id="scanCanvas" class="hidden"></canvas>
     </div>
 
     <script
