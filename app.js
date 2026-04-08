@@ -30,7 +30,6 @@ const texts = {
     narrationLabel: "Audio Guide",
     playAudioBtn: "重新播放讲解",
     stopAudioBtn: "停止讲解",
-    motionStatus: "体感控制未开启。",
     motionEnabled: "体感控制已开启，虚拟人会跟随手机轻微倾斜。",
     motionDenied: "设备未授予体感权限，无法启用倾斜跟随。",
     motionUnsupported: "当前设备或浏览器不支持体感倾斜控制。",
@@ -78,7 +77,6 @@ const texts = {
     narrationLabel: "Audio Guide",
     playAudioBtn: "Replay Narration",
     stopAudioBtn: "Stop Narration",
-    motionStatus: "Motion control is off.",
     motionEnabled: "Motion control is enabled. The virtual guide now tilts gently with your phone.",
     motionDenied: "Motion permission was not granted, so tilt-follow cannot be enabled.",
     motionUnsupported: "This device or browser does not support motion-based tilt control.",
@@ -179,8 +177,7 @@ const elements = {
   signImageInput: document.getElementById("signImageInput"),
   ocrStatus: document.getElementById("ocrStatus"),
   playAudioBtn: document.getElementById("playAudioBtn"),
-  stopAudioBtn: document.getElementById("stopAudioBtn"),
-  motionStatus: document.getElementById("motionStatus")
+  stopAudioBtn: document.getElementById("stopAudioBtn")
 };
 
 let map;
@@ -214,8 +211,7 @@ const translatableIds = [
   "scanSignBtn",
   "ocrStatus",
   "playAudioBtn",
-  "stopAudioBtn",
-  "motionStatus"
+  "stopAudioBtn"
 ];
 
 function showScreen(screen) {
@@ -262,7 +258,6 @@ async function enableMotionControl() {
   const t = getCopy();
 
   if (typeof window === "undefined" || typeof window.DeviceOrientationEvent === "undefined") {
-    elements.motionStatus.textContent = t.motionUnsupported;
     return;
   }
 
@@ -270,7 +265,6 @@ async function enableMotionControl() {
     if (typeof DeviceOrientationEvent.requestPermission === "function") {
       const result = await DeviceOrientationEvent.requestPermission();
       if (result !== "granted") {
-        elements.motionStatus.textContent = t.motionDenied;
         return;
       }
     }
@@ -282,9 +276,8 @@ async function enableMotionControl() {
 
     elements.avatarCard.classList.add("motion-active");
     applyTilt(0, 0);
-    elements.motionStatus.textContent = t.motionEnabled;
   } catch {
-    elements.motionStatus.textContent = t.motionDenied;
+    return;
   }
 }
 
@@ -309,7 +302,6 @@ function applyTranslations() {
   elements.visitorChip.textContent = t.visitor;
   elements.selectionHint.textContent = state.role ? t.roleReady(state.role) : t.selectionHint;
   elements.ocrStatus.textContent = t.ocrStatus;
-  elements.motionStatus.textContent = motionEnabled ? t.motionEnabled : t.motionStatus;
   updateNarration();
 }
 
