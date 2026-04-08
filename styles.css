@@ -352,13 +352,13 @@ select {
 .avatar-card {
   left: 5%;
   bottom: 5%;
-  width: min(36vw, 360px);
-  height: min(58vh, 460px);
-  border-radius: 26px;
+  width: min(28vw, 260px);
+  height: min(42vh, 320px);
+  border-radius: 22px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(2px);
 }
 
 model-viewer {
@@ -366,6 +366,7 @@ model-viewer {
   height: 100%;
   --progress-bar-color: transparent;
   --poster-color: transparent;
+  background: transparent;
 }
 
 .narration-card {
@@ -392,10 +393,9 @@ model-viewer {
 
   .avatar-card {
     left: 24px;
-    right: 24px;
-    width: auto;
-    height: 320px;
-    bottom: 224px;
+    width: min(36vw, 200px);
+    height: 240px;
+    bottom: 200px;
   }
 
   .narration-card {
@@ -439,5 +439,22 @@ model-viewer {
 
   .camera-stage {
     min-height: 700px;
+  }
+
+  .avatar-card {
+    left: 16px;
+    width: 150px;
+    height: 190px;
+    bottom: 188px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    backdrop-filter: none;
+  }
+
+  .narration-card {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
   }
 }
