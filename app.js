@@ -165,11 +165,8 @@ const elements = {
   leafletMap: document.getElementById("leafletMap"),
   mapStatusLine: document.getElementById("mapStatusLine"),
   backToMapBtn: document.getElementById("backToMapBtn"),
-  arrivalBanner: document.getElementById("arrivalBanner"),
   avatarCard: document.getElementById("avatarCard"),
   avatarViewer: document.getElementById("avatarViewer"),
-  narrationTitle: document.getElementById("narrationTitle"),
-  narrationBody: document.getElementById("narrationBody"),
   scanSignBtn: document.getElementById("scanSignBtn"),
   signImageInput: document.getElementById("signImageInput"),
   ocrStatus: document.getElementById("ocrStatus"),
@@ -202,7 +199,6 @@ const translatableIds = [
   "cameraKicker",
   "cameraTitle",
   "backToMapBtn",
-  "narrationLabel",
   "scanKicker",
   "scanTitle",
   "scanSignBtn",
@@ -229,10 +225,6 @@ function getPoiNarration(poi = state.activePoi) {
 }
 
 function updateNarration() {
-  const content = getPoiNarration();
-  elements.narrationTitle.textContent = content.title;
-  elements.narrationBody.textContent = content.body;
-  elements.arrivalBanner.textContent = getCopy().arrived(getCopy()[state.activePoi.nameKey]);
   updateAvatarMode();
 }
 
@@ -373,7 +365,6 @@ async function runOcrOnImage(file) {
   state.activePoi = matchedPoi;
   updateNarration();
   elements.ocrStatus.textContent = t.ocrMatched(getCopy()[matchedPoi.nameKey]);
-  elements.arrivalBanner.textContent = t.ocrMatched(getCopy()[matchedPoi.nameKey]);
   speakNarration();
 }
 
