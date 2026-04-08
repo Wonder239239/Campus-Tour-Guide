@@ -128,7 +128,7 @@ const pois = [
 
 const state = {
   role: "",
-  language: "zh",
+  language: "en",
   activePoi: pois[0],
   currentStream: null
 };

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -30,23 +30,23 @@
             <img src="./assets/xjtlu-building.jpg" alt="XJTLU campus building" class="brand-illustration" />
           </div>
           <p class="eyebrow" id="heroTag">XJTLU Campus Guide</p>
-          <h1 id="heroTitle">欢迎来到西交利物浦大学校园导览</h1>
+          <h1 id="heroTitle">Welcome to the XJTLU Smart Campus AR Guide</h1>
           <p class="hero-text" id="heroText">
-            先选择页面语言，然后进入身份选择。系统会在地图页获取实时定位，并在你到达景点后自动打开 AR 讲解页面。
+            Select the page language first, then continue to identity selection. The system uses live positioning on the map page and automatically opens the AR explanation page when you arrive at a landmark.
           </p>
 
           <div class="field-group">
             <label class="select-field">
-              <span id="languageLabel">语言</span>
+              <span id="languageLabel">Language</span>
               <select id="languageSelect">
+                <option value="en" selected>English</option>
                 <option value="zh">中文</option>
-                <option value="en">English</option>
               </select>
             </label>
           </div>
 
           <div class="button-row">
-            <button class="primary-btn" id="goRoleBtn">进入身份选择</button>
+            <button class="primary-btn" id="goRoleBtn">Start Experience</button>
           </div>
         </div>
       </section>
@@ -56,22 +56,22 @@
           <div class="brand-plate compact-plate">
             <img src="./assets/xjtlu-building.jpg" alt="XJTLU campus building" class="brand-illustration" />
           </div>
-          <p class="eyebrow" id="roleKicker">Choose Your Identity</p>
-          <h2 id="roleTitle">请选择身份</h2>
+          <p class="eyebrow" id="roleKicker">User Identity</p>
+          <h2 id="roleTitle">Select User Identity</h2>
           <p class="screen-text" id="roleText">
-            选择学生或访客后，进入校园地图与实时定位页面。
+            The system presents a unified guidance flow for different user groups and then enters the campus map and live positioning page.
           </p>
 
           <div class="chip-grid" id="roleChips">
-            <button class="choice-chip" data-role="student" id="studentChip">学生</button>
-            <button class="choice-chip" data-role="visitor" id="visitorChip">访客</button>
+            <button class="choice-chip" data-role="student" id="studentChip">Student</button>
+            <button class="choice-chip" data-role="visitor" id="visitorChip">Visitor</button>
           </div>
 
-          <p class="status-text" id="selectionHint">请先选择身份。</p>
+          <p class="status-text" id="selectionHint">Please select an identity before continuing.</p>
 
           <div class="button-row">
-            <button class="ghost-btn" id="backToIntroBtn">返回上一步</button>
-            <button class="primary-btn" id="goMapBtn">进入校园地图</button>
+            <button class="ghost-btn" id="backToIntroBtn">Back To Language</button>
+            <button class="primary-btn" id="goMapBtn">Enter Map Positioning</button>
           </div>
         </div>
       </section>
@@ -81,9 +81,9 @@
           <div class="section-heading">
             <div>
               <p class="section-kicker" id="mapKicker">XJTLU SIP Campus</p>
-              <h2 id="mapTitle">西交利物浦大学校园地图</h2>
+              <h2 id="mapTitle">Campus Map And Live Positioning</h2>
             </div>
-            <button class="ghost-btn" id="backToRoleBtn">返回身份选择</button>
+            <button class="ghost-btn" id="backToRoleBtn">Back To Identity</button>
           </div>
 
           <div class="map-stage">
@@ -91,12 +91,12 @@
           </div>
 
           <p class="map-status-line" id="mapStatusLine">
-            点击“启动实时定位”后，系统将获取当前位置并持续判断你与目标建筑的距离。
+            After starting live positioning, the system gets the current location and continuously evaluates your distance from the target building.
           </p>
 
           <div class="button-row map-actions">
-            <button class="primary-btn compact-btn" id="startLocationBtn">开始实时定位</button>
-            <button class="ghost-btn compact-btn hidden" id="demoArrivalBtn">模拟到达最近景点</button>
+            <button class="primary-btn compact-btn" id="startLocationBtn">Start Live Positioning</button>
+            <button class="ghost-btn compact-btn hidden" id="demoArrivalBtn">Demo Mode: Enter AR Directly</button>
           </div>
         </div>
       </section>
@@ -106,13 +106,13 @@
           <div class="camera-header">
             <div>
               <p class="section-kicker" id="cameraKicker">AR Storytelling</p>
-              <h2 id="cameraTitle">西浦 AR 讲解页</h2>
+              <h2 id="cameraTitle">AR Building Explanation Page</h2>
             </div>
-            <button class="ghost-btn" id="backToMapBtn">返回地图页</button>
+            <button class="ghost-btn" id="backToMapBtn">Back To Positioning Page</button>
           </div>
 
           <div class="arrival-banner" id="arrivalBanner">
-            你已到达西浦图书馆，正在打开 AR 讲解。
+            Recognition successful: you have arrived at XJTLU Library. The system is now opening the AR explanation page.
           </div>
 
           <div class="camera-stage">
@@ -129,14 +129,14 @@
               ></model-viewer>
             </div>
             <div class="narration-card">
-              <p class="narration-label" id="narrationLabel">Now Playing</p>
-              <h3 id="narrationTitle">西浦图书馆 AR 讲解</h3>
+              <p class="narration-label" id="narrationLabel">Audio Guide</p>
+              <h3 id="narrationTitle">XJTLU Library AR Narration</h3>
               <p id="narrationBody">
-                图书馆位于中心楼 3 至 10 层，是支持学习、教学与研究的重要空间。
+                The Library is located on floors 3 to 10 of the Central Building and supports learning, teaching, and research.
               </p>
               <div class="button-row">
-                <button class="primary-btn" id="playAudioBtn">播放讲解</button>
-                <button class="ghost-btn" id="stopAudioBtn">停止语音</button>
+                <button class="primary-btn" id="playAudioBtn">Replay Narration</button>
+                <button class="ghost-btn" id="stopAudioBtn">Stop Narration</button>
               </div>
             </div>
           </div>
