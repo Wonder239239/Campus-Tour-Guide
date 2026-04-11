@@ -409,7 +409,7 @@ function syncAuthModeUi() {
 
   elements.registerModeBtn.classList.toggle("active", isRegister);
   elements.loginModeBtn.classList.toggle("active", !isRegister);
-  elements.nameField.classList.toggle("hidden", !isRegister);
+  elements.nameField.classList.remove("hidden");
   elements.confirmPasswordField.classList.toggle("hidden", !isRegister);
 
   document.getElementById("registerTitle").textContent = isRegister ? t.registerTitle : t.loginTitle;
