@@ -442,7 +442,7 @@ async function submitRegistration() {
   const confirmPassword = elements.confirmPasswordInput.value;
 
   if (!window.authProviderState?.ready) {
-    elements.registerStatus.textContent = t.authNotReady;
+    elements.registerStatus.textContent = window.authProviderState?.message || t.authNotReady;
     return;
   }
 
