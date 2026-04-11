@@ -5,7 +5,24 @@ const texts = {
     heroText:
       "本系统面向校园参观与信息导览场景设计。用户将依次完成语言选择、身份确认、地图定位与 AR 讲解体验，在到达目标建筑后自动进入沉浸式介绍页面。",
     languageLabel: "语言",
-    goRoleBtn: "开始体验",
+    goRoleBtn: "进入注册",
+    registerKicker: "Firebase Registration",
+    registerTitle: "创建账户",
+    registerText: "请先通过 Firebase Authentication 完成注册，再进入后续校园导览流程。",
+    nameLabel: "姓名",
+    emailLabel: "邮箱地址",
+    passwordLabel: "密码",
+    confirmPasswordLabel: "确认密码",
+    registerStatus: "请填写完整信息，然后创建 Firebase 账户。",
+    registerLoading: "正在创建账户，请稍候。",
+    registerSubmitBtn: "注册并继续",
+    backToIntroFromRegisterBtn: "返回语言页",
+    registerEmpty: "请完整填写姓名、邮箱、密码和确认密码。",
+    registerMismatch: "两次输入的密码不一致。",
+    registerWeak: "密码长度至少需要 6 位。",
+    registerSuccess: "注册成功，系统已发送验证邮件。现在进入身份选择页面。",
+    firebaseNotReady: "Firebase 尚未配置完成。请先在 firebase-config.js 中填写你自己的项目参数。",
+    registerFailed: (message) => `注册失败：${message}`,
     roleKicker: "User Identity",
     roleTitle: "请选择用户身份",
     roleText: "系统将根据不同用户类型展示统一的导览流程，并在下一步进入校园地图与实时定位页面。",
@@ -13,7 +30,7 @@ const texts = {
     visitor: "访客",
     selectionHint: "请选择身份后继续。",
     roleReady: (role) => `当前身份：${role === "student" ? "学生" : "访客"}。可进入地图定位阶段。`,
-    backToIntroBtn: "返回语言页",
+    backToIntroBtn: "返回注册页",
     goMapBtn: "进入地图定位",
     mapKicker: "XJTLU SIP Campus",
     mapTitle: "校园地图与实时定位",
@@ -54,7 +71,24 @@ const texts = {
     heroText:
       "This system is designed for campus visiting and information guidance scenarios. Users proceed through language selection, identity confirmation, map-based positioning, and AR explanation, then automatically enter an immersive building introduction page upon arrival.",
     languageLabel: "Language",
-    goRoleBtn: "Start Experience",
+    goRoleBtn: "Go To Registration",
+    registerKicker: "Firebase Registration",
+    registerTitle: "Create Your Account",
+    registerText: "Register with Firebase Authentication before entering the campus guide flow.",
+    nameLabel: "Full Name",
+    emailLabel: "Email Address",
+    passwordLabel: "Password",
+    confirmPasswordLabel: "Confirm Password",
+    registerStatus: "Complete all fields, then create your Firebase account.",
+    registerLoading: "Creating account. Please wait.",
+    registerSubmitBtn: "Register And Continue",
+    backToIntroFromRegisterBtn: "Back To Language",
+    registerEmpty: "Please complete name, email, password, and confirm password.",
+    registerMismatch: "The two passwords do not match.",
+    registerWeak: "Password must be at least 6 characters long.",
+    registerSuccess: "Registration succeeded. A verification email has been sent. Continue to identity selection.",
+    firebaseNotReady: "Firebase is not configured yet. Replace the placeholder values in firebase-config.js first.",
+    registerFailed: (message) => `Registration failed: ${message}`,
     roleKicker: "User Identity",
     roleTitle: "Select User Identity",
     roleText: "The system presents a unified guidance flow for different user groups and then enters the campus map and live positioning page.",
@@ -62,7 +96,7 @@ const texts = {
     visitor: "Visitor",
     selectionHint: "Please select an identity before continuing.",
     roleReady: (role) => `Current identity: ${role === "student" ? "Student" : "Visitor"}. You can proceed to map positioning.`,
-    backToIntroBtn: "Back To Language",
+    backToIntroBtn: "Back To Registration",
     goMapBtn: "Enter Map Positioning",
     mapKicker: "XJTLU SIP Campus",
     mapTitle: "Campus Map And Live Positioning",
@@ -153,16 +187,26 @@ const state = {
   role: "",
   language: "en",
   activePoi: pois[0],
-  currentStream: null
+  currentStream: null,
+  registeredUser: null
 };
 
 const elements = {
   introScreen: document.getElementById("introScreen"),
+  registerScreen: document.getElementById("registerScreen"),
   roleScreen: document.getElementById("roleScreen"),
   mapScreen: document.getElementById("mapScreen"),
   arScreen: document.getElementById("arScreen"),
   languageSelect: document.getElementById("languageSelect"),
   goRoleBtn: document.getElementById("goRoleBtn"),
+  registerForm: document.getElementById("registerForm"),
+  nameInput: document.getElementById("nameInput"),
+  emailInput: document.getElementById("emailInput"),
+  passwordInput: document.getElementById("passwordInput"),
+  confirmPasswordInput: document.getElementById("confirmPasswordInput"),
+  registerStatus: document.getElementById("registerStatus"),
+  backToIntroFromRegisterBtn: document.getElementById("backToIntroFromRegisterBtn"),
+  registerSubmitBtn: document.getElementById("registerSubmitBtn"),
   roleChips: document.querySelectorAll("[data-role]"),
   studentChip: document.getElementById("studentChip"),
   visitorChip: document.getElementById("visitorChip"),
@@ -202,6 +246,15 @@ const translatableIds = [
   "heroText",
   "languageLabel",
   "goRoleBtn",
+  "registerKicker",
+  "registerTitle",
+  "registerText",
+  "nameLabel",
+  "emailLabel",
+  "passwordLabel",
+  "confirmPasswordLabel",
+  "backToIntroFromRegisterBtn",
+  "registerSubmitBtn",
   "roleKicker",
   "roleTitle",
   "roleText",
@@ -228,7 +281,7 @@ const translatableIds = [
 ];
 
 function showScreen(screen) {
-  [elements.introScreen, elements.roleScreen, elements.mapScreen, elements.arScreen].forEach((node) => {
+  [elements.introScreen, elements.registerScreen, elements.roleScreen, elements.mapScreen, elements.arScreen].forEach((node) => {
     node.classList.add("hidden");
     node.classList.remove("screen-active");
   });
@@ -313,9 +366,63 @@ function applyTranslations() {
 
   elements.studentChip.textContent = t.student;
   elements.visitorChip.textContent = t.visitor;
+  elements.registerStatus.textContent = t.registerStatus;
   elements.selectionHint.textContent = state.role ? t.roleReady(state.role) : t.selectionHint;
   elements.ocrStatus.textContent = t.ocrStatus;
   updateNarration();
+}
+
+function getFirebaseErrorMessage(error) {
+  const code = error?.code || "";
+  const messages = {
+    "auth/email-already-in-use": state.language === "zh" ? "该邮箱已被注册。" : "This email is already registered.",
+    "auth/invalid-email": state.language === "zh" ? "邮箱格式无效。" : "The email address is invalid.",
+    "auth/weak-password": state.language === "zh" ? "密码强度不足，请至少使用 6 位字符。" : "Password is too weak. Use at least 6 characters.",
+    "auth/network-request-failed": state.language === "zh" ? "网络请求失败，请检查网络连接。" : "Network request failed. Check your connection."
+  };
+  return messages[code] || error?.message || "Unknown error.";
+}
+
+async function submitRegistration() {
+  const t = getCopy();
+  const name = elements.nameInput.value.trim();
+  const email = elements.emailInput.value.trim();
+  const password = elements.passwordInput.value;
+  const confirmPassword = elements.confirmPasswordInput.value;
+
+  if (!name || !email || !password || !confirmPassword) {
+    elements.registerStatus.textContent = t.registerEmpty;
+    return;
+  }
+
+  if (password !== confirmPassword) {
+    elements.registerStatus.textContent = t.registerMismatch;
+    return;
+  }
+
+  if (password.length < 6) {
+    elements.registerStatus.textContent = t.registerWeak;
+    return;
+  }
+
+  if (!window.firebaseAuthState?.ready || typeof window.firebaseRegister !== "function") {
+    elements.registerStatus.textContent = t.firebaseNotReady;
+    return;
+  }
+
+  elements.registerSubmitBtn.disabled = true;
+  elements.registerStatus.textContent = t.registerLoading;
+
+  try {
+    const user = await window.firebaseRegister({ name, email, password });
+    state.registeredUser = user;
+    elements.registerStatus.textContent = t.registerSuccess;
+    showScreen(elements.roleScreen);
+  } catch (error) {
+    elements.registerStatus.textContent = t.registerFailed(getFirebaseErrorMessage(error));
+  } finally {
+    elements.registerSubmitBtn.disabled = false;
+  }
 }
 
 function setRole(role) {
@@ -580,14 +687,21 @@ elements.languageSelect.addEventListener("change", (event) => {
 });
 
 elements.goRoleBtn.addEventListener("click", () => {
-  showScreen(elements.roleScreen);
+  showScreen(elements.registerScreen);
+});
+
+elements.backToIntroFromRegisterBtn.addEventListener("click", () => showScreen(elements.introScreen));
+elements.registerSubmitBtn.addEventListener("click", submitRegistration);
+elements.registerForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  submitRegistration();
 });
 
 elements.roleChips.forEach((chip) => {
   chip.addEventListener("click", () => setRole(chip.dataset.role));
 });
 
-elements.backToIntroBtn.addEventListener("click", () => showScreen(elements.introScreen));
+elements.backToIntroBtn.addEventListener("click", () => showScreen(elements.registerScreen));
 
 elements.goMapBtn.addEventListener("click", () => {
   if (!state.role) {
