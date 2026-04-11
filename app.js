@@ -1,7 +1,7 @@
 const texts = {
   zh: {
-    heroTag: "XJTLU Campus Guide",
-    heroTitle: "西交利物浦大学智慧校园 AR 导览系统",
+    heroTag: "X·EasyGo",
+    heroTitle: "欢迎使用 X·EasyGo",
     heroText:
       "本系统面向校园参观与信息导览场景设计。用户将依次完成语言选择、身份确认、地图定位与 AR 讲解体验，在到达目标建筑后自动进入沉浸式介绍页面。",
     languageLabel: "语言",
@@ -79,8 +79,8 @@ const texts = {
     locationDenied: "未获取到定位权限。请在浏览器中允许定位访问后重试，或使用演示模式继续展示。"
   },
   en: {
-    heroTag: "XJTLU Campus Guide",
-    heroTitle: "XJTLU Smart Campus AR Guide System",
+    heroTag: "X·EasyGo",
+    heroTitle: "Welcome to X·EasyGo",
     heroText:
       "This system is designed for campus visiting and information guidance scenarios. Users proceed through language selection, identity confirmation, map-based positioning, and AR explanation, then automatically enter an immersive building introduction page upon arrival.",
     languageLabel: "Language",
