@@ -32,21 +32,21 @@ const texts = {
     registerFailed: (message) => `注册失败：${message}`,
     roleSaving: "正在保存身份信息，请稍候。",
     roleSaveFailed: (message) => `身份保存失败：${message}`,
-    roleLoaded: (role) => `已读取你的身份：${role === "student" ? "学生" : "访客"}。系统将直接进入地图定位页面。`,
+    roleLoaded: (role) => `已读取你的身份：${role === "student" ? "新生" : "访客"}。系统将直接进入地图定位页面。`,
     roleKicker: "User Identity",
     roleTitle: "请选择用户身份",
-    student: "学生",
+    student: "新生",
     visitor: "访客",
     selectionHint: "请选择身份后继续。",
-    roleReady: (role) => `当前身份：${role === "student" ? "学生" : "访客"}。可进入地图定位阶段。`,
+    roleReady: (role) => `当前身份：${role === "student" ? "新生" : "访客"}。可进入地图定位阶段。`,
     backToIntroBtn: "返回注册页",
     goMapBtn: "进入地图定位",
     mapKicker: "XJTLU SIP Campus",
     mapTitle: "校园地图与实时定位",
     backToRoleBtn: "返回身份页",
-    library: "西浦图书馆",
-    garden: "西浦博物馆",
-    hall: "南校区体育中心",
+    library: "FB（Foundation Building）",
+    garden: "CB（Central Building）",
+    hall: "SD（Science Building D）",
     mapStatusLine: "",
     startLocationBtn: "启动实时定位",
     demoArrivalBtn: "演示模式：直接进入 AR",
@@ -132,21 +132,21 @@ const texts = {
     registerFailed: (message) => `Registration failed: ${message}`,
     roleSaving: "Saving your identity. Please wait.",
     roleSaveFailed: (message) => `Failed to save identity: ${message}`,
-    roleLoaded: (role) => `Your saved identity is ${role === "student" ? "Student" : "Visitor"}. Opening the map page directly.`,
+    roleLoaded: (role) => `Your saved identity is ${role === "student" ? "New Student" : "Visitor"}. Opening the map page directly.`,
     roleKicker: "User Identity",
     roleTitle: "Select User Identity",
-    student: "Student",
+    student: "New Student",
     visitor: "Visitor",
     selectionHint: "Please select an identity before continuing.",
-    roleReady: (role) => `Current identity: ${role === "student" ? "Student" : "Visitor"}. You can proceed to map positioning.`,
+    roleReady: (role) => `Current identity: ${role === "student" ? "New Student" : "Visitor"}. You can proceed to map positioning.`,
     backToIntroBtn: "Back To Registration",
     goMapBtn: "Enter Map Positioning",
     mapKicker: "XJTLU SIP Campus",
     mapTitle: "Campus Map And Live Positioning",
     backToRoleBtn: "Back To Identity",
-    library: "XJTLU Library",
-    garden: "XJTLU Museum",
-    hall: "South Campus Sports Centre",
+    library: "FB (Foundation Building)",
+    garden: "CB (Central Building)",
+    hall: "SD (Science Building D)",
     mapStatusLine: "",
     startLocationBtn: "Start Live Positioning",
     demoArrivalBtn: "Demo Mode: Enter AR Directly",
@@ -204,42 +204,54 @@ const texts = {
 const poiNarration = {
   zh: {
     library: {
-      title: "西浦图书馆 AR 讲解",
-      body: "图书馆位于中心楼 3 至 10 层，是支持学习、教学与研究的重要空间。",
+      title: "FB（Foundation Building）讲解",
+      body: "FB 是西交利物浦大学最早投入使用的教学楼之一，是了解校园发展起点的重要地点。",
       speech: (role) =>
-        `欢迎来到西交利物浦大学图书馆。根据西浦官网信息，图书馆位于中心楼三到十层，支持学习、教学与研究，并提供纸质馆藏、电子资源和开放学习区域。${role === "student" ? "如果你是学生，这里是自习、借阅和学术检索的核心场所。" : "如果你是访客，这里能帮助你快速感受西浦开放、国际化的学习环境。"}`
+        role === "student"
+          ? "欢迎来到 FB，也就是 Foundation Building。作为大一新生最常上课的地方，FB 几乎承载了你进入大学后的第一段学习经历。从英语课程到基础专业课，这里不仅是学习的起点，也往往是你认识同学、适应大学节奏的第一站。"
+          : "欢迎来到 FB，也就是 Foundation Building。FB 是西交利物浦大学最早投入使用的教学楼之一，主要承担基础课程教学任务，建筑风格简洁实用，体现了学校从创立初期到逐步发展的历史起点，是了解校园发展脉络的重要地点。"
     },
     garden: {
-      title: "西浦博物馆 AR 讲解",
-      body: "西浦博物馆位于中心楼一层，以展览和文化活动呈现学校的发展历程与大学文化。",
+      title: "CB（Central Building）讲解",
+      body: "CB 是校园最具标志性的建筑之一，也是学校学术与文化交汇的核心枢纽。",
       speech: (role) =>
-        `欢迎来到西浦博物馆。根据西浦官网信息，博物馆位于中心楼一层，于二零一四年向公众开放，致力于展示学校在高等教育创新方面的探索、实践与标志性成果。${role === "student" ? "对学生来说，这里不仅是了解校园文化的入口，也是参与展览和跨学科活动的重要空间。" : "对访客来说，这里是最快了解西浦办学特色与校园精神的展示窗口。"}`
+        role === "student"
+          ? "欢迎来到 CB，也就是 Central Building。CB 不仅是你查资料、自习和借书的首选地点，也是办理事务、参加活动和与朋友相遇的校园中心。无论是赶 due 还是放松交流，这里几乎贯穿了你的整个大学生活。"
+          : "欢迎来到 CB，也就是 Central Building。CB 是校园最具标志性的建筑之一，其设计灵感来源于中国传统太湖石造型，外观现代且富有艺术感，内部集图书馆、学习空间、行政服务和学生活动区域于一体，是学校学术与文化交汇的核心枢纽。"
     },
     hall: {
-      title: "南校区体育中心 AR 讲解",
-      body: "南校区体育中心拥有攀岩墙、射箭区、跑道以及多类球场，是西浦校园活力的重要代表。",
+      title: "SD（Science Building D）讲解",
+      body: "SD 是理科教学与科研楼群的重要组成部分，也是从基础学习迈向专业能力培养的重要场所。",
       speech: (role) =>
-        `欢迎来到西浦南校区体育中心。根据西浦官网信息，南校区拥有设施完善的体育空间，包括攀岩墙、射箭区、跑道、健身区域以及篮球、羽毛球、网球、壁球和高尔夫等多类场地。${role === "student" ? "这里是学生锻炼身体、参加社团和建立校园连接的重要场所。" : "这里也能让访客直观感受到西浦重视全面发展和校园活力的一面。"}`
+        role === "student"
+          ? "欢迎来到 SD，也就是 Science Building D。当你从大一进入专业学习阶段后，SD 等理科楼会逐渐成为你的主要学习场所。在这里你将参与实验课程、项目实践和小组合作，是从基础知识迈向专业能力培养的重要阶段。"
+          : "欢迎来到 SD，也就是 Science Building D。SD 属于理科教学与科研楼群的一部分，内部设有各类实验室、科研空间和专业教室，体现了学校在科学研究和实践教学方面的投入与实力，是展示理工科教育的重要窗口。"
     }
   },
   en: {
     library: {
-      title: "XJTLU Library AR Narration",
-      body: "The Library is located on floors 3 to 10 of the Central Building and supports learning, teaching, and research.",
+      title: "FB (Foundation Building) Narration",
+      body: "FB is one of the earliest teaching buildings at XJTLU and an important place for understanding the campus origins.",
       speech: (role) =>
-        `Welcome to the XJTLU Library. According to the official university site, the Library is located on floors three to ten of the Central Building and supports learning, teaching, and research, with print collections, electronic resources, and open study areas. ${role === "student" ? "For students, it is one of the main spaces for study, borrowing, and academic discovery." : "For visitors, it offers a quick and clear impression of XJTLU's open and international learning environment."}`
+        role === "student"
+          ? "Welcome to FB, the Foundation Building. For first-year students, FB is one of the most frequently visited buildings, where most foundation and introductory courses take place. It is not only the starting point of academic learning but also where students begin to meet classmates and adapt to university life."
+          : "Welcome to FB, the Foundation Building. The Foundation Building is one of the earliest teaching buildings at Xi'an Jiaotong–Liverpool University. It is mainly used for delivering foundation-level courses, and its simple, functional design reflects the university's early development stage, making it an important place to understand the origins of the campus."
     },
     garden: {
-      title: "XJTLU Museum AR Narration",
-      body: "The XJTLU Museum is on the ground floor of the Central Building and presents the University's journey and culture through exhibitions.",
+      title: "CB (Central Building) Narration",
+      body: "CB is one of the most iconic landmarks on campus and serves as the academic and social hub of the university.",
       speech: (role) =>
-        `Welcome to the XJTLU Museum. According to the official university site, the Museum is located on the ground floor of the Central Building and opened to the public in 2014. It showcases the University's exploration, practices, and landmark achievements in higher education innovation. ${role === "student" ? "For students, it is an important place to engage with campus culture and interdisciplinary activities." : "For visitors, it is one of the fastest ways to understand XJTLU's distinctive identity and educational vision."}`
+        role === "student"
+          ? "Welcome to CB, the Central Building. For students, CB is much more than a library. It is the central place for studying, attending activities, handling administrative matters, and socializing. Whether preparing for deadlines or relaxing with friends, CB plays a key role throughout university life."
+          : "Welcome to CB, the Central Building. The Central Building is one of the most iconic landmarks on campus. Inspired by the shape of traditional Taihu stones, its design blends modern architecture with cultural elements, and it houses the library, study areas, administrative offices, and student activity spaces, serving as the academic and social hub of the university."
     },
     hall: {
-      title: "South Campus Sports Centre AR Narration",
-      body: "The South Campus Sports Centre features a climbing wall, archery range, running track, fitness area, and multiple courts.",
+      title: "SD (Science Building D) Narration",
+      body: "SD is part of the university's science complex and reflects its emphasis on research and practical learning.",
       speech: (role) =>
-        `Welcome to the XJTLU South Campus Sports Centre. According to the official university site, the South Campus includes an extensive sports facility with a climbing wall, archery range, running track, fitness area, and courts for basketball, badminton, tennis, squash, and more. ${role === "student" ? "For students, it is a key place for fitness, clubs, and campus community life." : "For visitors, it shows XJTLU's emphasis on whole-person development and vibrant campus life."}`
+        role === "student"
+          ? "Welcome to SD, Science Building D. As students progress into their second and third years, SD becomes one of the main places for study. Here, students engage in laboratory work, group projects, and professional training, marking an important transition from foundational learning to advanced specialization."
+          : "Welcome to SD, Science Building D. Science Building D is part of the university's science complex, equipped with laboratories, research facilities, and specialized classrooms. It reflects the university's strong emphasis on scientific research and practical learning."
     }
   }
 };
