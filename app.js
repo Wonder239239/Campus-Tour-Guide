@@ -54,6 +54,7 @@ const texts = {
     mapStatusLine: "点击“启动实时定位”后，系统将获取当前位置并持续判断你与目标建筑的距离。",
     startLocationBtn: "启动实时定位",
     demoArrivalBtn: "演示模式：直接进入 AR",
+    openStampBookBtn: "集章页面",
     cameraKicker: "AR Storytelling",
     cameraTitle: "虚拟讲解页面",
     backToMapBtn: "返回地图定位页",
@@ -66,12 +67,25 @@ const texts = {
     scanKicker: "OCR Trigger",
     scanTitle: "扫描建筑标示牌",
     scanSignBtn: "扫描标示牌",
+    openStampBookFromArBtn: "集章页面",
     ocrStatus: "点击下方按钮打开扫描模式。系统会通过 OCR 自动识别标示牌文字，并触发对应建筑的讲解动画。",
     scanOverlayText: "请将建筑标示牌置于扫描框内，系统会自动进行 OCR 识别。",
     closeScanBtn: "关闭扫描",
     ocrProcessing: "正在识别标示牌文字，请稍候。",
     ocrNoMatch: "未识别到可匹配的建筑名称。请尽量让标示牌文字更清晰。",
     ocrMatched: (name) => `OCR 识别成功，已匹配到${name}，正在切换对应讲解与动画。`,
+    stampKicker: "Stamp Collection",
+    stampTitle: "我的校园集章册",
+    stampText: "扫描目标建筑代码即可收集 X·EasyGo 专属印章。",
+    backFromStampBtn: "返回",
+    stampNameCb: "CB 印章",
+    stampNameSd: "SD 印章",
+    stampNameMb: "MB 印章",
+    stampLocked: "暂未收集",
+    stampUnlocked: "已收集",
+    stampSummary: (count) => `已收集 ${count} / 3 枚印章。`,
+    stampCollected: (code) => `恭喜，已成功收集 ${code} 印章。`,
+    stampAlreadyCollected: (code) => `${code} 印章已经收集过了。`,
     requestingLocation: "正在请求定位权限，请允许浏览器访问当前设备位置。",
     locating: "定位成功，系统正在判断你是否已进入目标建筑识别范围。",
     noNearby: (name, meters) => `当前距离 ${name} 约 ${meters} 米。请继续靠近目标建筑，或使用演示模式直接进入 AR 页面。`,
@@ -133,6 +147,7 @@ const texts = {
     mapStatusLine: "After starting live positioning, the system gets the current location and continuously evaluates your distance from the target building.",
     startLocationBtn: "Start Live Positioning",
     demoArrivalBtn: "Demo Mode: Enter AR Directly",
+    openStampBookBtn: "Stamp Collection",
     cameraKicker: "AR Storytelling",
     cameraTitle: "Virtual Guide Explanation Page",
     backToMapBtn: "Back To Positioning Page",
@@ -145,6 +160,7 @@ const texts = {
     scanKicker: "OCR Trigger",
     scanTitle: "Scan Building Sign",
     scanSignBtn: "Scan Sign",
+    openStampBookFromArBtn: "Stamp Collection",
     ocrStatus:
       "Tap the button below to open scan mode. OCR text recognition runs automatically and triggers the matching building explanation animation.",
     scanOverlayText: "Align the building sign inside the frame. OCR scanning runs automatically.",
@@ -152,6 +168,18 @@ const texts = {
     ocrProcessing: "Recognizing sign text. Please wait.",
     ocrNoMatch: "No matching building name was recognized. Try to make the sign text clearer.",
     ocrMatched: (name) => `OCR matched ${name}. Switching to the corresponding explanation and animation.`,
+    stampKicker: "Stamp Collection",
+    stampTitle: "Your Campus Stamp Book",
+    stampText: "Scan the target building codes to collect X·EasyGo stamps.",
+    backFromStampBtn: "Back",
+    stampNameCb: "CB Stamp",
+    stampNameSd: "SD Stamp",
+    stampNameMb: "MB Stamp",
+    stampLocked: "Not collected yet.",
+    stampUnlocked: "Collected",
+    stampSummary: (count) => `${count} / 3 stamps collected.`,
+    stampCollected: (code) => `${code} stamp collected successfully.`,
+    stampAlreadyCollected: (code) => `${code} stamp has already been collected.`,
     requestingLocation: "Requesting location permission. Please allow the browser to access the current device position.",
     locating: "Location received. The system is checking whether you have entered the recognition range of the target building.",
     noNearby: (name, meters) => `You are about ${meters} meters away from ${name}. Please continue approaching the target building, or use demo mode to enter the AR page directly.`,
@@ -215,8 +243,16 @@ const state = {
   authMode: "register",
   activePoi: pois[0],
   currentStream: null,
-  registeredUser: null
+  registeredUser: null,
+  collectedStamps: [],
+  previousScreen: "map"
 };
+
+const stampDefinitions = [
+  { id: "cb", code: "CB" },
+  { id: "sd", code: "SD" },
+  { id: "mb", code: "MB" }
+];
 
 const elements = {
   introScreen: document.getElementById("introScreen"),
@@ -224,6 +260,7 @@ const elements = {
   roleScreen: document.getElementById("roleScreen"),
   mapScreen: document.getElementById("mapScreen"),
   arScreen: document.getElementById("arScreen"),
+  stampScreen: document.getElementById("stampScreen"),
   languageSelect: document.getElementById("languageSelect"),
   goRoleBtn: document.getElementById("goRoleBtn"),
   registerForm: document.getElementById("registerForm"),
@@ -246,12 +283,14 @@ const elements = {
   backToRoleBtn: document.getElementById("backToRoleBtn"),
   startLocationBtn: document.getElementById("startLocationBtn"),
   demoArrivalBtn: document.getElementById("demoArrivalBtn"),
+  openStampBookBtn: document.getElementById("openStampBookBtn"),
   leafletMap: document.getElementById("leafletMap"),
   mapStatusLine: document.getElementById("mapStatusLine"),
   backToMapBtn: document.getElementById("backToMapBtn"),
   avatarCard: document.getElementById("avatarCard"),
   avatarViewer: document.getElementById("avatarViewer"),
   scanSignBtn: document.getElementById("scanSignBtn"),
+  openStampBookFromArBtn: document.getElementById("openStampBookFromArBtn"),
   ocrStatus: document.getElementById("ocrStatus"),
   scanOverlay: document.getElementById("scanOverlay"),
   scanVideo: document.getElementById("scanVideo"),
@@ -259,7 +298,15 @@ const elements = {
   scanOverlayText: document.getElementById("scanOverlayText"),
   closeScanBtn: document.getElementById("closeScanBtn"),
   playAudioBtn: document.getElementById("playAudioBtn"),
-  stopAudioBtn: document.getElementById("stopAudioBtn")
+  stopAudioBtn: document.getElementById("stopAudioBtn"),
+  stampSummary: document.getElementById("stampSummary"),
+  backFromStampBtn: document.getElementById("backFromStampBtn"),
+  stampSlotCb: document.getElementById("stampSlotCb"),
+  stampSlotSd: document.getElementById("stampSlotSd"),
+  stampSlotMb: document.getElementById("stampSlotMb"),
+  stampDescCb: document.getElementById("stampDescCb"),
+  stampDescSd: document.getElementById("stampDescSd"),
+  stampDescMb: document.getElementById("stampDescMb")
 };
 
 let map;
@@ -298,21 +345,30 @@ const translatableIds = [
   "mapStatusLine",
   "startLocationBtn",
   "demoArrivalBtn",
+  "openStampBookBtn",
   "cameraKicker",
   "cameraTitle",
   "backToMapBtn",
   "scanKicker",
   "scanTitle",
   "scanSignBtn",
+  "openStampBookFromArBtn",
   "scanOverlayText",
   "closeScanBtn",
   "ocrStatus",
   "playAudioBtn",
-  "stopAudioBtn"
+  "stopAudioBtn",
+  "stampKicker",
+  "stampTitle",
+  "stampText",
+  "backFromStampBtn",
+  "stampNameCb",
+  "stampNameSd",
+  "stampNameMb"
 ];
 
 function showScreen(screen) {
-  [elements.introScreen, elements.registerScreen, elements.roleScreen, elements.mapScreen, elements.arScreen].forEach((node) => {
+  [elements.introScreen, elements.registerScreen, elements.roleScreen, elements.mapScreen, elements.arScreen, elements.stampScreen].forEach((node) => {
     node.classList.add("hidden");
     node.classList.remove("screen-active");
   });
@@ -330,6 +386,23 @@ function getPoiNarration(poi = state.activePoi) {
 
 function updateNarration() {
   updateAvatarMode();
+}
+
+function renderStampBook() {
+  const t = getCopy();
+  const stampMap = {
+    cb: { slot: elements.stampSlotCb, desc: elements.stampDescCb },
+    sd: { slot: elements.stampSlotSd, desc: elements.stampDescSd },
+    mb: { slot: elements.stampSlotMb, desc: elements.stampDescMb }
+  };
+
+  stampDefinitions.forEach((stamp) => {
+    const collected = state.collectedStamps.includes(stamp.id);
+    stampMap[stamp.id].slot.classList.toggle("stamp-collected", collected);
+    stampMap[stamp.id].desc.textContent = collected ? t.stampUnlocked : t.stampLocked;
+  });
+
+  elements.stampSummary.textContent = t.stampSummary(state.collectedStamps.length);
 }
 
 function updateAvatarMode() {
@@ -401,6 +474,7 @@ function applyTranslations() {
   elements.selectionHint.textContent = state.role ? t.roleReady(state.role) : t.selectionHint;
   elements.ocrStatus.textContent = t.ocrStatus;
   updateNarration();
+  renderStampBook();
 }
 
 function syncAuthModeUi() {
@@ -481,6 +555,7 @@ async function submitRegistration() {
       : await window.authLogin({ name, password });
     state.registeredUser = user;
     const profile = typeof window.authGetProfile === "function" ? await window.authGetProfile(user.id) : null;
+    state.collectedStamps = Array.isArray(profile?.stamps) ? profile.stamps : [];
 
     if (profile?.role) {
       state.role = profile.role;
@@ -578,6 +653,50 @@ function matchPoiFromText(rawText) {
   return matchers.find((entry) => entry.keywords.some((keyword) => text.includes(keyword)))?.poi || null;
 }
 
+function matchStampFromText(rawText) {
+  const text = ` ${rawText.toLowerCase().replace(/\s+/g, " ")} `;
+  const matchers = [
+    { id: "cb", code: "CB", keywords: [" cb "] },
+    { id: "sd", code: "SD", keywords: [" sd "] },
+    { id: "mb", code: "MB", keywords: [" mb "] }
+  ];
+
+  return matchers.find((entry) => entry.keywords.some((keyword) => text.includes(keyword))) || null;
+}
+
+async function persistProfile() {
+  if (!state.registeredUser?.id || typeof window.authSaveProfile !== "function") {
+    return;
+  }
+
+  await window.authSaveProfile({
+    uid: state.registeredUser.id,
+    role: state.role || null,
+    stamps: state.collectedStamps
+  });
+}
+
+async function collectStamp(stampMatch) {
+  const t = getCopy();
+
+  if (state.collectedStamps.includes(stampMatch.id)) {
+    elements.ocrStatus.textContent = t.stampAlreadyCollected(stampMatch.code);
+    return true;
+  }
+
+  state.collectedStamps = [...state.collectedStamps, stampMatch.id];
+  renderStampBook();
+  elements.ocrStatus.textContent = t.stampCollected(stampMatch.code);
+
+  try {
+    await persistProfile();
+  } catch (error) {
+    elements.ocrStatus.textContent = t.roleSaveFailed(getAuthErrorMessage(error));
+  }
+
+  return true;
+}
+
 async function runOcrOnImage(file) {
   const t = getCopy();
   elements.ocrStatus.textContent = t.ocrProcessing;
@@ -596,6 +715,12 @@ async function runOcrOnImage(file) {
     text = result.data.text || "";
   } else {
     elements.ocrStatus.textContent = t.ocrNoMatch;
+    return;
+  }
+
+  const matchedStamp = matchStampFromText(text);
+  if (matchedStamp) {
+    await collectStamp(matchedStamp);
     return;
   }
 
@@ -640,6 +765,13 @@ async function runOcrOnCanvas() {
     const lang = state.language === "zh" ? "eng+chi_sim" : "eng";
     const result = await window.Tesseract.recognize(canvas, lang);
     const text = result.data.text || "";
+    const matchedStamp = matchStampFromText(text);
+    if (matchedStamp) {
+      await collectStamp(matchedStamp);
+      closeScanOverlay();
+      return;
+    }
+
     const matchedPoi = matchPoiFromText(text);
 
     if (matchedPoi) {
@@ -790,10 +922,7 @@ elements.goMapBtn.addEventListener("click", async () => {
     elements.selectionHint.textContent = getCopy().roleSaving;
 
     try {
-      await window.authSaveProfile({
-        uid: state.registeredUser.id,
-        role: state.role
-      });
+      await persistProfile();
     } catch (error) {
       elements.selectionHint.textContent = getCopy().roleSaveFailed(getAuthErrorMessage(error));
       elements.goMapBtn.disabled = false;
@@ -810,10 +939,29 @@ elements.goMapBtn.addEventListener("click", async () => {
 elements.backToRoleBtn.addEventListener("click", () => showScreen(elements.roleScreen));
 elements.startLocationBtn.addEventListener("click", requestLocation);
 elements.demoArrivalBtn.addEventListener("click", () => openArScreen(state.activePoi));
+elements.openStampBookBtn.addEventListener("click", () => {
+  state.previousScreen = "map";
+  renderStampBook();
+  showScreen(elements.stampScreen);
+});
 elements.scanSignBtn.addEventListener("click", openScanOverlay);
+elements.openStampBookFromArBtn.addEventListener("click", () => {
+  state.previousScreen = "ar";
+  renderStampBook();
+  showScreen(elements.stampScreen);
+});
 elements.closeScanBtn.addEventListener("click", closeScanOverlay);
 elements.playAudioBtn.addEventListener("click", speakNarration);
 elements.stopAudioBtn.addEventListener("click", () => window.speechSynthesis.cancel());
+elements.backFromStampBtn.addEventListener("click", () => {
+  if (state.previousScreen === "ar") {
+    showScreen(elements.arScreen);
+    return;
+  }
+
+  showScreen(elements.mapScreen);
+  renderMap();
+});
 elements.backToMapBtn.addEventListener("click", () => {
   window.speechSynthesis.cancel();
   closeScanOverlay();

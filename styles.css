@@ -111,6 +111,10 @@ input {
   max-width: 760px;
 }
 
+.stamp-card {
+  max-width: 860px;
+}
+
 .map-card,
 .ar-card {
   display: grid;
@@ -202,6 +206,43 @@ select:focus {
 .auth-mode-switch {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.stamp-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.stamp-slot {
+  display: grid;
+  gap: 12px;
+  padding: 22px 18px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  text-align: center;
+}
+
+.stamp-collected {
+  background: linear-gradient(180deg, rgba(141, 107, 255, 0.22), rgba(255, 255, 255, 0.08));
+  border-color: rgba(216, 203, 255, 0.48);
+  box-shadow: 0 16px 30px rgba(78, 52, 184, 0.22);
+}
+
+.stamp-badge {
+  width: 92px;
+  height: 92px;
+  margin: 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 2px dashed rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.04);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
 }
 
 .button-row,
@@ -559,6 +600,10 @@ model-viewer {
   }
 
   .register-form {
+    grid-template-columns: 1fr;
+  }
+
+  .stamp-grid {
     grid-template-columns: 1fr;
   }
 

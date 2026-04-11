@@ -120,7 +120,7 @@ if (!hasUsableSupabaseConfig(config)) {
     window.authGetProfile = async (uid) => {
       const { data, error } = await supabase
         .from("user_profiles")
-        .select("role")
+        .select("role, stamps")
         .eq("uid", uid)
         .maybeSingle();
 
@@ -131,11 +131,12 @@ if (!hasUsableSupabaseConfig(config)) {
       return data;
     };
 
-    window.authSaveProfile = async ({ uid, role }) => {
+    window.authSaveProfile = async ({ uid, role, stamps = [] }) => {
       const { error } = await supabase.from("user_profiles").upsert(
         {
           uid,
           role,
+          stamps,
           updated_at: new Date().toISOString()
         },
         {

@@ -8,8 +8,12 @@ create table if not exists public.usernames (
 create table if not exists public.user_profiles (
   uid uuid primary key,
   role text check (role in ('student', 'visitor')),
+  stamps text[] not null default '{}',
   updated_at timestamptz not null default now()
 );
+
+alter table public.user_profiles
+add column if not exists stamps text[] not null default '{}';
 
 alter table public.usernames enable row level security;
 alter table public.user_profiles enable row level security;
