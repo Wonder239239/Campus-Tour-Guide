@@ -62,8 +62,13 @@
             Register with Firebase Authentication before entering the campus guide flow.
           </p>
 
+          <div class="chip-grid auth-mode-switch">
+            <button class="choice-chip active" id="registerModeBtn" type="button">Register</button>
+            <button class="choice-chip" id="loginModeBtn" type="button">Login</button>
+          </div>
+
           <form class="register-form" id="registerForm">
-            <label class="select-field">
+            <label class="select-field" id="nameField">
               <span id="nameLabel">Full Name</span>
               <input id="nameInput" type="text" autocomplete="name" />
             </label>
@@ -75,7 +80,7 @@
               <span id="passwordLabel">Password</span>
               <input id="passwordInput" type="password" autocomplete="new-password" />
             </label>
-            <label class="select-field">
+            <label class="select-field" id="confirmPasswordField">
               <span id="confirmPasswordLabel">Confirm Password</span>
               <input id="confirmPasswordInput" type="password" autocomplete="new-password" />
             </label>

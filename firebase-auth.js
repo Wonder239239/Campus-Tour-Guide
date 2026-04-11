@@ -3,6 +3,7 @@ import {
   createUserWithEmailAndPassword,
   getAuth,
   sendEmailVerification,
+  signInWithEmailAndPassword,
   updateProfile
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 
@@ -38,6 +39,11 @@ if (!hasUsableFirebaseConfig(config)) {
     }
 
     await sendEmailVerification(credential.user);
+    return credential.user;
+  };
+
+  window.firebaseLogin = async ({ email, password }) => {
+    const credential = await signInWithEmailAndPassword(auth, email, password);
     return credential.user;
   };
 }

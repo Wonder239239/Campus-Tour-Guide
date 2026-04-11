@@ -9,6 +9,8 @@ const texts = {
     registerKicker: "Firebase Registration",
     registerTitle: "创建账户",
     registerText: "请先通过 Firebase Authentication 完成注册，再进入后续校园导览流程。",
+    registerModeBtn: "注册",
+    loginModeBtn: "登录",
     nameLabel: "姓名",
     emailLabel: "邮箱地址",
     passwordLabel: "密码",
@@ -16,6 +18,13 @@ const texts = {
     registerStatus: "请填写完整信息，然后创建 Firebase 账户。",
     registerLoading: "正在创建账户，请稍候。",
     registerSubmitBtn: "注册并继续",
+    loginTitle: "登录账户",
+    loginText: "已注册用户可直接登录，然后进入后续校园导览流程。",
+    loginStatus: "请输入邮箱和密码后登录。",
+    loginLoading: "正在登录，请稍候。",
+    loginSubmitBtn: "登录并继续",
+    loginEmpty: "请输入邮箱和密码。",
+    loginSuccess: "登录成功，现在进入身份选择页面。",
     backToIntroFromRegisterBtn: "返回语言页",
     registerEmpty: "请完整填写姓名、邮箱、密码和确认密码。",
     registerMismatch: "两次输入的密码不一致。",
@@ -75,6 +84,8 @@ const texts = {
     registerKicker: "Firebase Registration",
     registerTitle: "Create Your Account",
     registerText: "Register with Firebase Authentication before entering the campus guide flow.",
+    registerModeBtn: "Register",
+    loginModeBtn: "Login",
     nameLabel: "Full Name",
     emailLabel: "Email Address",
     passwordLabel: "Password",
@@ -82,6 +93,13 @@ const texts = {
     registerStatus: "Complete all fields, then create your Firebase account.",
     registerLoading: "Creating account. Please wait.",
     registerSubmitBtn: "Register And Continue",
+    loginTitle: "Sign In To Your Account",
+    loginText: "Existing users can sign in directly and continue to the campus guide flow.",
+    loginStatus: "Enter your email and password to sign in.",
+    loginLoading: "Signing in. Please wait.",
+    loginSubmitBtn: "Login And Continue",
+    loginEmpty: "Please enter your email and password.",
+    loginSuccess: "Login succeeded. Continue to identity selection.",
     backToIntroFromRegisterBtn: "Back To Language",
     registerEmpty: "Please complete name, email, password, and confirm password.",
     registerMismatch: "The two passwords do not match.",
@@ -186,6 +204,7 @@ const pois = [
 const state = {
   role: "",
   language: "en",
+  authMode: "register",
   activePoi: pois[0],
   currentStream: null,
   registeredUser: null
@@ -200,9 +219,13 @@ const elements = {
   languageSelect: document.getElementById("languageSelect"),
   goRoleBtn: document.getElementById("goRoleBtn"),
   registerForm: document.getElementById("registerForm"),
+  registerModeBtn: document.getElementById("registerModeBtn"),
+  loginModeBtn: document.getElementById("loginModeBtn"),
+  nameField: document.getElementById("nameField"),
   nameInput: document.getElementById("nameInput"),
   emailInput: document.getElementById("emailInput"),
   passwordInput: document.getElementById("passwordInput"),
+  confirmPasswordField: document.getElementById("confirmPasswordField"),
   confirmPasswordInput: document.getElementById("confirmPasswordInput"),
   registerStatus: document.getElementById("registerStatus"),
   backToIntroFromRegisterBtn: document.getElementById("backToIntroFromRegisterBtn"),
@@ -249,6 +272,8 @@ const translatableIds = [
   "registerKicker",
   "registerTitle",
   "registerText",
+  "registerModeBtn",
+  "loginModeBtn",
   "nameLabel",
   "emailLabel",
   "passwordLabel",
@@ -366,10 +391,30 @@ function applyTranslations() {
 
   elements.studentChip.textContent = t.student;
   elements.visitorChip.textContent = t.visitor;
-  elements.registerStatus.textContent = t.registerStatus;
+  syncAuthModeUi();
   elements.selectionHint.textContent = state.role ? t.roleReady(state.role) : t.selectionHint;
   elements.ocrStatus.textContent = t.ocrStatus;
   updateNarration();
+}
+
+function syncAuthModeUi() {
+  const t = getCopy();
+  const isRegister = state.authMode === "register";
+
+  elements.registerModeBtn.classList.toggle("active", isRegister);
+  elements.loginModeBtn.classList.toggle("active", !isRegister);
+  elements.nameField.classList.toggle("hidden", !isRegister);
+  elements.confirmPasswordField.classList.toggle("hidden", !isRegister);
+
+  document.getElementById("registerTitle").textContent = isRegister ? t.registerTitle : t.loginTitle;
+  document.getElementById("registerText").textContent = isRegister ? t.registerText : t.loginText;
+  elements.registerSubmitBtn.textContent = isRegister ? t.registerSubmitBtn : t.loginSubmitBtn;
+  elements.registerStatus.textContent = isRegister ? t.registerStatus : t.loginStatus;
+}
+
+function setAuthMode(mode) {
+  state.authMode = mode;
+  syncAuthModeUi();
 }
 
 function getFirebaseErrorMessage(error) {
@@ -385,38 +430,46 @@ function getFirebaseErrorMessage(error) {
 
 async function submitRegistration() {
   const t = getCopy();
-  const name = elements.nameInput.value.trim();
   const email = elements.emailInput.value.trim();
   const password = elements.passwordInput.value;
+  const isRegister = state.authMode === "register";
+  const name = elements.nameInput.value.trim();
   const confirmPassword = elements.confirmPasswordInput.value;
 
-  if (!name || !email || !password || !confirmPassword) {
-    elements.registerStatus.textContent = t.registerEmpty;
-    return;
-  }
-
-  if (password !== confirmPassword) {
-    elements.registerStatus.textContent = t.registerMismatch;
-    return;
-  }
-
-  if (password.length < 6) {
-    elements.registerStatus.textContent = t.registerWeak;
-    return;
-  }
-
-  if (!window.firebaseAuthState?.ready || typeof window.firebaseRegister !== "function") {
+  if (!window.firebaseAuthState?.ready) {
     elements.registerStatus.textContent = t.firebaseNotReady;
     return;
   }
 
+  if (isRegister) {
+    if (!name || !email || !password || !confirmPassword) {
+      elements.registerStatus.textContent = t.registerEmpty;
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      elements.registerStatus.textContent = t.registerMismatch;
+      return;
+    }
+
+    if (password.length < 6) {
+      elements.registerStatus.textContent = t.registerWeak;
+      return;
+    }
+  } else if (!email || !password) {
+    elements.registerStatus.textContent = t.loginEmpty;
+    return;
+  }
+
   elements.registerSubmitBtn.disabled = true;
-  elements.registerStatus.textContent = t.registerLoading;
+  elements.registerStatus.textContent = isRegister ? t.registerLoading : t.loginLoading;
 
   try {
-    const user = await window.firebaseRegister({ name, email, password });
+    const user = isRegister
+      ? await window.firebaseRegister({ name, email, password })
+      : await window.firebaseLogin({ email, password });
     state.registeredUser = user;
-    elements.registerStatus.textContent = t.registerSuccess;
+    elements.registerStatus.textContent = isRegister ? t.registerSuccess : t.loginSuccess;
     showScreen(elements.roleScreen);
   } catch (error) {
     elements.registerStatus.textContent = t.registerFailed(getFirebaseErrorMessage(error));
@@ -690,6 +743,8 @@ elements.goRoleBtn.addEventListener("click", () => {
   showScreen(elements.registerScreen);
 });
 
+elements.registerModeBtn.addEventListener("click", () => setAuthMode("register"));
+elements.loginModeBtn.addEventListener("click", () => setAuthMode("login"));
 elements.backToIntroFromRegisterBtn.addEventListener("click", () => showScreen(elements.introScreen));
 elements.registerSubmitBtn.addEventListener("click", submitRegistration);
 elements.registerForm.addEventListener("submit", (event) => {

@@ -199,6 +199,11 @@ select:focus {
   gap: 16px;
 }
 
+.auth-mode-switch {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .button-row,
 .chip-grid {
   display: flex;
