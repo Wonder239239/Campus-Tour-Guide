@@ -95,7 +95,7 @@ const texts = {
     stampAlreadyCollected: (code) => `${code} 印章已经收集过了。`,
     requestingLocation: "正在请求定位权限，请允许浏览器访问当前设备位置。",
     locating: "定位成功，系统正在判断你是否已进入目标建筑识别范围。",
-    noNearby: () => "实时定位中，系统正在持续判断你是否进入 FB、CB、SD 的讲解范围。",
+    noNearby: () => "实时定位中",
     arrived: (name) => `已进入 ${name} 范围，系统正在播放讲解。`,
     locationDenied: "未获取到定位权限。请打开浏览器的站点设置或系统设置，将此网页的位置权限改为允许后重试；也可以先使用演示模式继续展示。"
   },
@@ -195,7 +195,7 @@ const texts = {
     stampAlreadyCollected: (code) => `${code} stamp has already been collected.`,
     requestingLocation: "Requesting location permission. Please allow the browser to access the current device position.",
     locating: "Location received. The system is checking whether you have entered the recognition range of the target building.",
-    noNearby: () => "Live positioning is running. The system is continuously checking whether you have entered the narration range of FB, CB, or SD.",
+    noNearby: () => "Live positioning active",
     arrived: (name) => `You have entered the ${name} range. The narration is now starting.`,
     locationDenied: "Location permission was not granted. Open this site's browser permission settings or your phone's system settings, change Location to Allow, then try again. You can also continue with demo mode."
   }
