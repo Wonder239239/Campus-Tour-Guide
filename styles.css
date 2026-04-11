@@ -627,43 +627,125 @@ model-viewer {
 
 @media (max-width: 640px) {
   .app-shell {
-    width: min(100% - 16px, 1180px);
-    padding-top: 12px;
+    width: min(100% - 12px, 1180px);
+    padding-top: 8px;
+    padding-bottom: 18px;
   }
 
   .screen {
-    min-height: calc(100vh - 32px);
+    min-height: calc(100vh - 20px);
   }
 
   .hero-card,
   .choice-card,
   .map-card,
   .ar-card {
-    padding: 22px;
+    padding: 18px;
   }
 
   .screen-card {
-    border-radius: 24px;
+    border-radius: 20px;
+  }
+
+  .eyebrow,
+  .section-kicker {
+    font-size: 0.72rem;
+    letter-spacing: 0.07em;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 8vw, 2.6rem);
+    max-width: 12ch;
+  }
+
+  h2 {
+    font-size: clamp(1.3rem, 5vw, 1.7rem);
+  }
+
+  h3 {
+    font-size: 1rem;
+  }
+
+  .hero-text,
+  .screen-text,
+  .status-text,
+  .map-status-line,
+  .scan-text,
+  .scan-overlay-text,
+  .scan-debug-text {
+    font-size: 0.92rem;
+    line-height: 1.55;
+  }
+
+  .brand-plate {
+    width: 100%;
+    padding: 10px;
+    border-radius: 22px;
+  }
+
+  .brand-illustration {
+    border-radius: 16px;
+  }
+
+  select,
+  input {
+    width: 100%;
+    padding: 13px 14px;
+    border-radius: 14px;
   }
 
   .section-heading,
   .camera-header {
     align-items: flex-start;
     flex-direction: column;
+    gap: 12px;
+  }
+
+  .button-row {
+    gap: 10px;
+  }
+
+  .choice-chip,
+  .primary-btn,
+  .ghost-btn {
+    min-height: 48px;
+    padding: 12px 15px;
+    font-size: 0.95rem;
+  }
+
+  .choice-chip {
+    min-height: 62px;
   }
 
   .map-stage {
-    min-height: 320px;
+    min-height: 260px;
+    border-radius: 18px;
+  }
+
+  .leaflet-map {
+    min-height: 260px;
+  }
+
+  .map-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .compact-btn {
+    width: 100%;
+    justify-content: center;
   }
 
   .guide-stage {
-    min-height: 560px;
+    min-height: 420px;
+    border-radius: 20px;
   }
 
   .avatar-card {
-    width: min(72vw, 280px);
-    height: 320px;
-    border-radius: 22px;
+    width: min(74vw, 240px);
+    height: 270px;
+    border-radius: 18px;
     background: rgba(255, 255, 255, 0.01);
     border: 1px solid rgba(255, 255, 255, 0.04);
     backdrop-filter: none;
@@ -671,7 +753,8 @@ model-viewer {
 
   .centered-narration {
     width: 100%;
-    margin-top: -8px;
+    margin-top: -2px;
+    padding: 14px 14px;
   }
 
   .guide-controls {
@@ -679,12 +762,44 @@ model-viewer {
   }
 
   .guide-control-btn {
-    padding: 9px 12px;
-    font-size: 0.84rem;
+    padding: 8px 10px;
+    min-height: 40px;
+    font-size: 0.78rem;
+  }
+
+  .scan-panel,
+  .stamp-slot,
+  .narration-card {
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .stamp-badge {
+    width: 74px;
+    height: 74px;
+    font-size: 1.25rem;
+  }
+
+  .scan-shell {
+    width: calc(100% - 12px);
+    gap: 10px;
+  }
+
+  .scan-camera-wrap {
+    min-height: 52vh;
+    border-radius: 18px;
+  }
+
+  .scan-frame {
+    width: min(82vw, 320px);
+    height: min(22vh, 116px);
+    border-radius: 16px;
   }
 
   .scan-overlay-bar {
     flex-direction: column;
     align-items: stretch;
+    padding: 12px 14px;
+    border-radius: 16px;
   }
 }
