@@ -767,22 +767,52 @@ async function runOcrOnCanvas() {
   const sx = Math.round((videoWidth - cropWidth) / 2);
   const sy = Math.round((videoHeight - cropHeight) / 2);
 
-  canvas.width = cropWidth;
-  canvas.height = cropHeight;
-  ctx.drawImage(elements.scanVideo, sx, sy, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+  const scale = 2;
+  canvas.width = cropWidth * scale;
+  canvas.height = cropHeight * scale;
+  ctx.drawImage(
+    elements.scanVideo,
+    sx,
+    sy,
+    cropWidth,
+    cropHeight,
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+  for (let i = 0; i < data.length; i += 4) {
+    const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+    const boosted = gray > 145 ? 255 : 0;
+    data[i] = boosted;
+    data[i + 1] = boosted;
+    data[i + 2] = boosted;
+  }
+  ctx.putImageData(imageData, 0, 0);
 
   try {
-    const lang = state.language === "zh" ? "eng+chi_sim" : "eng";
-    const result = await window.Tesseract.recognize(canvas, lang);
-    const text = result.data.text || "";
-    elements.scanDebugText.textContent = `${t.scanDebugPrefix} ${text.trim() || "N/A"}`;
-    const matchedStamp = matchStampFromText(text);
+    const stampResult = await window.Tesseract.recognize(canvas, "eng", {
+      tessedit_pageseg_mode: "8",
+      tessedit_char_whitelist: "CBSDMcbsdm"
+    });
+    const stampText = stampResult.data.text || "";
+    elements.scanDebugText.textContent = `${t.scanDebugPrefix} ${stampText.trim() || "N/A"}`;
+    const matchedStamp = matchStampFromText(stampText);
     if (matchedStamp) {
       await collectStamp(matchedStamp);
       closeScanOverlay();
       return;
     }
 
+    const lang = state.language === "zh" ? "eng+chi_sim" : "eng";
+    const result = await window.Tesseract.recognize(canvas, lang, {
+      tessedit_pageseg_mode: "7"
+    });
+    const text = result.data.text || "";
+    elements.scanDebugText.textContent = `${t.scanDebugPrefix} ${text.trim() || "N/A"}`;
     const matchedPoi = matchPoiFromText(text);
 
     if (matchedPoi) {
