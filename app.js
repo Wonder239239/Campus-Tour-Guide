@@ -2,23 +2,22 @@ const texts = {
   zh: {
     heroTag: "X·EasyGo",
     heroTitle: "欢迎使用 X·EasyGo",
-    heroText:
-      "本系统面向校园参观与信息导览场景设计。用户将依次完成语言选择、身份确认、地图定位与 AR 讲解体验，在到达目标建筑后自动进入沉浸式介绍页面。",
     languageLabel: "语言",
     goRoleBtn: "进入注册",
     registerKicker: "Supabase Authentication",
     registerTitle: "创建账户",
-    registerText: "请先完成注册，再进入后续校园导览流程。",
     registerModeBtn: "注册",
     loginModeBtn: "登录",
     nameLabel: "用户名",
     passwordLabel: "密码",
     confirmPasswordLabel: "确认密码",
+    authRequirementsTitle: "注册要求",
+    usernameRule: "用户名：3-16 位，仅支持字母和数字。",
+    passwordRule: "密码：至少 6 位。",
     registerStatus: "请输入用户名和密码，然后创建账户。",
     registerLoading: "正在创建账户，请稍候。",
     registerSubmitBtn: "注册并继续",
     loginTitle: "登录账户",
-    loginText: "已注册用户可直接登录，然后进入后续校园导览流程。",
     loginStatus: "请输入用户名和密码后登录。",
     loginLoading: "正在登录，请稍候。",
     loginSubmitBtn: "登录并继续",
@@ -26,6 +25,7 @@ const texts = {
     loginSuccess: "登录成功，现在进入身份选择页面。",
     backToIntroFromRegisterBtn: "返回语言页",
     registerEmpty: "请完整填写用户名、密码和确认密码。",
+    invalidUsername: "用户名需为 3-16 位，且只能包含字母和数字。",
     registerMismatch: "两次输入的密码不一致。",
     registerWeak: "密码长度至少需要 6 位。",
     registerSuccess: "注册成功，现在进入身份选择页面。",
@@ -38,7 +38,6 @@ const texts = {
     roleLoaded: (role) => `已读取你的身份：${role === "student" ? "学生" : "访客"}。系统将直接进入地图定位页面。`,
     roleKicker: "User Identity",
     roleTitle: "请选择用户身份",
-    roleText: "系统将根据不同用户类型展示统一的导览流程，并在下一步进入校园地图与实时定位页面。",
     student: "学生",
     visitor: "访客",
     selectionHint: "请选择身份后继续。",
@@ -68,7 +67,7 @@ const texts = {
     scanTitle: "扫描印章代码",
     scanSignBtn: "扫描标示牌",
     openStampBookFromArBtn: "集章页面",
-    ocrStatus: "点击下方按钮打开扫描模式。系统会优先识别 CB、SD、MB 三种印章代码，并自动完成集章。",
+    ocrStatus: "点击开始扫描。",
     scanOverlayText: "请将 CB、SD 或 MB 代码完整置于扫描框中央，系统会自动识别并收集印章。",
     scanFrameLabel: "请将 CB / SD / MB 置于框内中央",
     scanDebugPrefix: "OCR 识别结果：",
@@ -78,7 +77,6 @@ const texts = {
     ocrMatched: (name) => `OCR 识别成功，已匹配到${name}，正在切换对应讲解与动画。`,
     stampKicker: "Stamp Collection",
     stampTitle: "我的校园集章册",
-    stampText: "扫描目标建筑代码即可收集 X·EasyGo 专属印章。",
     backFromStampBtn: "返回",
     stampNameCb: "CB 印章",
     stampNameSd: "SD 印章",
@@ -97,23 +95,22 @@ const texts = {
   en: {
     heroTag: "X·EasyGo",
     heroTitle: "Welcome to X·EasyGo",
-    heroText:
-      "This system is designed for campus visiting and information guidance scenarios. Users proceed through language selection, identity confirmation, map-based positioning, and AR explanation, then automatically enter an immersive building introduction page upon arrival.",
     languageLabel: "Language",
     goRoleBtn: "Go To Registration",
     registerKicker: "Supabase Authentication",
     registerTitle: "Create Your Account",
-    registerText: "Register before entering the campus guide flow.",
     registerModeBtn: "Register",
     loginModeBtn: "Login",
     nameLabel: "Username",
     passwordLabel: "Password",
     confirmPasswordLabel: "Confirm Password",
+    authRequirementsTitle: "Requirements",
+    usernameRule: "Username: 3-16 characters, letters and numbers only.",
+    passwordRule: "Password: at least 6 characters.",
     registerStatus: "Enter a username and password to create your account.",
     registerLoading: "Creating account. Please wait.",
     registerSubmitBtn: "Register And Continue",
     loginTitle: "Sign In To Your Account",
-    loginText: "Existing users can sign in directly and continue to the campus guide flow.",
     loginStatus: "Enter your username and password to sign in.",
     loginLoading: "Signing in. Please wait.",
     loginSubmitBtn: "Login And Continue",
@@ -121,6 +118,7 @@ const texts = {
     loginSuccess: "Login succeeded. Continue to identity selection.",
     backToIntroFromRegisterBtn: "Back To Language",
     registerEmpty: "Please complete username, password, and confirm password.",
+    invalidUsername: "Username must be 3-16 characters and contain only letters and numbers.",
     registerMismatch: "The two passwords do not match.",
     registerWeak: "Password must be at least 6 characters long.",
     registerSuccess: "Registration succeeded. Continue to identity selection.",
@@ -133,7 +131,6 @@ const texts = {
     roleLoaded: (role) => `Your saved identity is ${role === "student" ? "Student" : "Visitor"}. Opening the map page directly.`,
     roleKicker: "User Identity",
     roleTitle: "Select User Identity",
-    roleText: "The system presents a unified guidance flow for different user groups and then enters the campus map and live positioning page.",
     student: "Student",
     visitor: "Visitor",
     selectionHint: "Please select an identity before continuing.",
@@ -163,8 +160,7 @@ const texts = {
     scanTitle: "Scan Stamp Code",
     scanSignBtn: "Scan Sign",
     openStampBookFromArBtn: "Stamp Collection",
-    ocrStatus:
-      "Open scan mode to detect the CB, SD, and MB stamp codes. Matching codes will be collected automatically.",
+    ocrStatus: "Tap to start scanning.",
     scanOverlayText: "Place the full CB, SD, or MB code in the middle of the frame. Scanning runs automatically.",
     scanFrameLabel: "Align CB / SD / MB in the center",
     scanDebugPrefix: "OCR reads:",
@@ -174,7 +170,6 @@ const texts = {
     ocrMatched: (name) => `OCR matched ${name}. Switching to the corresponding explanation and animation.`,
     stampKicker: "Stamp Collection",
     stampTitle: "Your Campus Stamp Book",
-    stampText: "Scan the target building codes to collect X·EasyGo stamps.",
     backFromStampBtn: "Back",
     stampNameCb: "CB Stamp",
     stampNameSd: "SD Stamp",
@@ -325,22 +320,22 @@ let scanBusy = false;
 const translatableIds = [
   "heroTag",
   "heroTitle",
-  "heroText",
   "languageLabel",
   "goRoleBtn",
   "registerKicker",
   "registerTitle",
-  "registerText",
   "registerModeBtn",
   "loginModeBtn",
   "nameLabel",
   "passwordLabel",
   "confirmPasswordLabel",
+  "authRequirementsTitle",
+  "usernameRule",
+  "passwordRule",
   "backToIntroFromRegisterBtn",
   "registerSubmitBtn",
   "roleKicker",
   "roleTitle",
-  "roleText",
   "selectionHint",
   "backToIntroBtn",
   "goMapBtn",
@@ -366,7 +361,6 @@ const translatableIds = [
   "stopAudioBtn",
   "stampKicker",
   "stampTitle",
-  "stampText",
   "backFromStampBtn",
   "stampNameCb",
   "stampNameSd",
@@ -493,7 +487,6 @@ function syncAuthModeUi() {
   elements.confirmPasswordField.classList.toggle("hidden", !isRegister);
 
   document.getElementById("registerTitle").textContent = isRegister ? t.registerTitle : t.loginTitle;
-  document.getElementById("registerText").textContent = isRegister ? t.registerText : t.loginText;
   elements.registerSubmitBtn.textContent = isRegister ? t.registerSubmitBtn : t.loginSubmitBtn;
   elements.registerStatus.textContent = isRegister ? t.registerStatus : t.loginStatus;
 }
@@ -520,6 +513,10 @@ function getAuthErrorMessage(error) {
   return messages[code] || error?.message || "Unknown error.";
 }
 
+function isValidUsername(username) {
+  return /^[A-Za-z0-9]{3,16}$/.test(username);
+}
+
 async function submitRegistration() {
   const t = getCopy();
   const name = elements.nameInput.value.trim();
@@ -538,6 +535,11 @@ async function submitRegistration() {
       return;
     }
 
+    if (!isValidUsername(name)) {
+      elements.registerStatus.textContent = t.invalidUsername;
+      return;
+    }
+
     if (password !== confirmPassword) {
       elements.registerStatus.textContent = t.registerMismatch;
       return;
@@ -549,6 +551,9 @@ async function submitRegistration() {
     }
   } else if (!name || !password) {
     elements.registerStatus.textContent = t.loginEmpty;
+    return;
+  } else if (!isValidUsername(name)) {
+    elements.registerStatus.textContent = t.invalidUsername;
     return;
   }
 

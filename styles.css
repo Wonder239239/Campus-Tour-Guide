@@ -208,6 +208,15 @@ select:focus {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.auth-requirements {
+  display: grid;
+  gap: 8px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
 .stamp-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -535,12 +544,65 @@ model-viewer {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: min(72vw, 360px);
-  height: min(26vh, 140px);
+  width: min(84vw, 460px);
+  height: min(34vh, 220px);
   transform: translate(-50%, -50%);
-  border: 2px solid rgba(255, 255, 255, 0.88);
-  border-radius: 20px;
+  display: grid;
+  align-content: space-between;
+  justify-items: center;
+  padding: 18px 16px 20px;
+  border: 3px solid rgba(216, 203, 255, 0.95);
+  border-radius: 24px;
   box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.24);
+  background: linear-gradient(180deg, rgba(141, 107, 255, 0.08), rgba(255, 255, 255, 0.02));
+}
+
+.scan-frame::before,
+.scan-frame::after {
+  content: "";
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(216, 203, 255, 0.95), transparent);
+  animation: scanPulse 1.9s ease-in-out infinite;
+}
+
+.scan-frame::before {
+  top: 28%;
+}
+
+.scan-frame::after {
+  top: 72%;
+}
+
+.scan-frame-label {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(15, 9, 43, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  font-size: 0.9rem;
+  color: #f6f2ff;
+  text-align: center;
+}
+
+.scan-frame-codes {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.scan-frame-codes span {
+  min-width: 64px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: rgba(15, 9, 43, 0.68);
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-align: center;
 }
 
 .scan-overlay-bar {
@@ -579,6 +641,18 @@ model-viewer {
   }
   50% {
     transform: translate(-50%, calc(-50% - 10px));
+  }
+}
+
+@keyframes scanPulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scaleX(0.94);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scaleX(1);
   }
 }
 
@@ -791,9 +865,24 @@ model-viewer {
   }
 
   .scan-frame {
-    width: min(82vw, 320px);
-    height: min(22vh, 116px);
-    border-radius: 16px;
+    width: min(88vw, 340px);
+    height: min(26vh, 170px);
+    padding: 14px 12px 16px;
+    border-radius: 18px;
+  }
+
+  .scan-frame-label {
+    font-size: 0.78rem;
+  }
+
+  .scan-frame-codes {
+    gap: 8px;
+  }
+
+  .scan-frame-codes span {
+    min-width: 52px;
+    padding: 8px 10px;
+    font-size: 0.88rem;
   }
 
   .scan-overlay-bar {

@@ -31,9 +31,6 @@
           </div>
           <p class="eyebrow" id="heroTag">X·EasyGo</p>
           <h1 id="heroTitle">Welcome to X·EasyGo</h1>
-          <p class="hero-text" id="heroText">
-            Select the page language first, then continue to identity selection. The system uses live positioning on the map page and automatically opens the AR explanation page when you arrive at a landmark.
-          </p>
 
           <div class="field-group">
             <label class="select-field">
@@ -58,13 +55,16 @@
           </div>
           <p class="eyebrow" id="registerKicker">Supabase Authentication</p>
           <h2 id="registerTitle">Create Your Account</h2>
-          <p class="screen-text" id="registerText">
-            Register or log in before entering the campus guide flow.
-          </p>
 
           <div class="chip-grid auth-mode-switch">
             <button class="choice-chip active" id="registerModeBtn" type="button">Register</button>
             <button class="choice-chip" id="loginModeBtn" type="button">Login</button>
+          </div>
+
+          <div class="auth-requirements" id="authRequirements">
+            <p class="eyebrow" id="authRequirementsTitle">Requirements</p>
+            <p class="status-text" id="usernameRule">Username: 3-16 characters, letters or numbers only.</p>
+            <p class="status-text" id="passwordRule">Password: at least 6 characters.</p>
           </div>
 
           <form class="register-form" id="registerForm">
@@ -100,9 +100,6 @@
           </div>
           <p class="eyebrow" id="roleKicker">User Identity</p>
           <h2 id="roleTitle">Select User Identity</h2>
-          <p class="screen-text" id="roleText">
-            The system presents a unified guidance flow for different user groups and then enters the campus map and live positioning page.
-          </p>
 
           <div class="chip-grid" id="roleChips">
             <button class="choice-chip" data-role="student" id="studentChip">Student</button>
@@ -131,10 +128,7 @@
           <div class="map-stage">
             <div id="leafletMap" class="leaflet-map" aria-label="XJTLU live map"></div>
           </div>
-
-          <p class="map-status-line" id="mapStatusLine">
-            After starting live positioning, the system gets the current location and continuously evaluates your distance from the target building.
-          </p>
+          <p class="map-status-line" id="mapStatusLine"></p>
 
           <div class="button-row map-actions">
             <button class="primary-btn compact-btn" id="startLocationBtn">Start Live Positioning</button>
@@ -180,9 +174,7 @@
             <div>
               <p class="eyebrow" id="scanKicker">OCR Trigger</p>
               <h3 class="scan-title" id="scanTitle">Scan Building Sign</h3>
-              <p class="scan-text" id="ocrStatus">
-                Tap the button below to scan a building sign. OCR text recognition will trigger the matching explanation animation.
-              </p>
+              <p class="scan-text" id="ocrStatus"></p>
             </div>
             <div class="button-row">
               <button class="primary-btn compact-btn" id="scanSignBtn">Scan Sign</button>
@@ -201,10 +193,6 @@
             </div>
             <button class="ghost-btn" id="backFromStampBtn">Back</button>
           </div>
-
-          <p class="screen-text" id="stampText">
-            Scan the three target codes to collect all X·EasyGo stamps.
-          </p>
 
           <div class="stamp-grid">
             <article class="stamp-slot" id="stampSlotCb">
@@ -233,7 +221,14 @@
       <div class="scan-shell">
         <div class="scan-camera-wrap">
           <video id="scanVideo" autoplay playsinline muted></video>
-          <div class="scan-frame"></div>
+          <div class="scan-frame">
+            <div class="scan-frame-label" id="scanFrameLabel">Align CB / SD / MB inside the frame</div>
+            <div class="scan-frame-codes">
+              <span>CB</span>
+              <span>SD</span>
+              <span>MB</span>
+            </div>
+          </div>
         </div>
         <div class="scan-overlay-bar">
           <p class="scan-overlay-text" id="scanOverlayText">
