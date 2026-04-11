@@ -221,6 +221,30 @@
           </div>
 
           <p class="status-text" id="stampSummary">0 / 3 stamps collected.</p>
+          <div class="button-row">
+            <button class="ghost-btn" id="openLeaderboardBtn">View Leaderboard</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen hidden" id="leaderboardScreen">
+        <div class="screen-card choice-card stamp-card">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker" id="leaderboardKicker">Stamp Leaderboard</p>
+              <h2 id="leaderboardTitle">Collection Ranking</h2>
+            </div>
+            <button class="ghost-btn" id="backFromLeaderboardBtn">Back</button>
+          </div>
+
+          <div class="leaderboard-list" id="leaderboardList">
+            <div class="leaderboard-row leaderboard-row-head">
+              <span id="leaderboardRankHead">Rank</span>
+              <span id="leaderboardUserHead">Username</span>
+              <span id="leaderboardCountHead">Stamps</span>
+            </div>
+          </div>
+          <p class="status-text" id="leaderboardStatus"></p>
         </div>
       </section>
     </div>

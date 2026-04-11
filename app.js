@@ -74,6 +74,17 @@ const texts = {
     stampKicker: "Stamp Collection",
     stampTitle: "我的校园集章册",
     backFromStampBtn: "返回",
+    openLeaderboardBtn: "排行榜",
+    leaderboardKicker: "集章排行榜",
+    leaderboardTitle: "收集数量排行榜",
+    backFromLeaderboardBtn: "返回",
+    leaderboardRankHead: "排名",
+    leaderboardUserHead: "用户名",
+    leaderboardCountHead: "数量",
+    leaderboardLoading: "正在加载排行榜。",
+    leaderboardEmpty: "当前还没有可显示的收集记录。",
+    leaderboardCount: (count) => `${count} 枚`,
+    leaderboardLoadFailed: (message) => `排行榜加载失败：${message}`,
     stampNameCb: "CB 印章",
     stampNameSd: "SD 印章",
     stampNameFb: "FB 印章",
@@ -163,6 +174,17 @@ const texts = {
     stampKicker: "Stamp Collection",
     stampTitle: "Your Campus Stamp Book",
     backFromStampBtn: "Back",
+    openLeaderboardBtn: "Leaderboard",
+    leaderboardKicker: "Stamp Leaderboard",
+    leaderboardTitle: "Collection Ranking",
+    backFromLeaderboardBtn: "Back",
+    leaderboardRankHead: "Rank",
+    leaderboardUserHead: "Username",
+    leaderboardCountHead: "Stamps",
+    leaderboardLoading: "Loading leaderboard.",
+    leaderboardEmpty: "No collection records are available yet.",
+    leaderboardCount: (count) => `${count}`,
+    leaderboardLoadFailed: (message) => `Failed to load leaderboard: ${message}`,
     stampNameCb: "CB Stamp",
     stampNameSd: "SD Stamp",
     stampNameFb: "FB Stamp",
@@ -252,6 +274,7 @@ const elements = {
   mapScreen: document.getElementById("mapScreen"),
   arScreen: document.getElementById("arScreen"),
   stampScreen: document.getElementById("stampScreen"),
+  leaderboardScreen: document.getElementById("leaderboardScreen"),
   languageSelect: document.getElementById("languageSelect"),
   goRoleBtn: document.getElementById("goRoleBtn"),
   registerForm: document.getElementById("registerForm"),
@@ -298,7 +321,11 @@ const elements = {
   playAudioBtn: document.getElementById("playAudioBtn"),
   stopAudioBtn: document.getElementById("stopAudioBtn"),
   stampSummary: document.getElementById("stampSummary"),
+  openLeaderboardBtn: document.getElementById("openLeaderboardBtn"),
   backFromStampBtn: document.getElementById("backFromStampBtn"),
+  backFromLeaderboardBtn: document.getElementById("backFromLeaderboardBtn"),
+  leaderboardList: document.getElementById("leaderboardList"),
+  leaderboardStatus: document.getElementById("leaderboardStatus"),
   stampSlotCb: document.getElementById("stampSlotCb"),
   stampSlotSd: document.getElementById("stampSlotSd"),
   stampSlotFb: document.getElementById("stampSlotFb"),
@@ -358,13 +385,20 @@ const translatableIds = [
   "stampKicker",
   "stampTitle",
   "backFromStampBtn",
+  "openLeaderboardBtn",
+  "leaderboardKicker",
+  "leaderboardTitle",
+  "backFromLeaderboardBtn",
+  "leaderboardRankHead",
+  "leaderboardUserHead",
+  "leaderboardCountHead",
   "stampNameCb",
   "stampNameSd",
   "stampNameFb"
 ];
 
 function showScreen(screen) {
-  [elements.introScreen, elements.registerScreen, elements.roleScreen, elements.mapScreen, elements.arScreen, elements.stampScreen].forEach((node) => {
+  [elements.introScreen, elements.registerScreen, elements.roleScreen, elements.mapScreen, elements.arScreen, elements.stampScreen, elements.leaderboardScreen].forEach((node) => {
     node.classList.add("hidden");
     node.classList.remove("screen-active");
   });
@@ -399,6 +433,56 @@ function renderStampBook() {
   });
 
   elements.stampSummary.textContent = t.stampSummary(state.collectedStamps.length);
+}
+
+function renderLeaderboardRows(rows) {
+  const t = getCopy();
+  const head = `
+    <div class="leaderboard-row leaderboard-row-head">
+      <span>${t.leaderboardRankHead}</span>
+      <span>${t.leaderboardUserHead}</span>
+      <span>${t.leaderboardCountHead}</span>
+    </div>
+  `;
+
+  if (!rows.length) {
+    elements.leaderboardList.innerHTML = `${head}<p class="leaderboard-empty">${t.leaderboardEmpty}</p>`;
+    return;
+  }
+
+  elements.leaderboardList.innerHTML =
+    head +
+    rows
+      .map(
+        (entry, index) => `
+          <div class="leaderboard-row">
+            <span class="leaderboard-rank">#${index + 1}</span>
+            <span>${entry.username}</span>
+            <span class="leaderboard-count">${t.leaderboardCount(entry.count)}</span>
+          </div>
+        `
+      )
+      .join("");
+}
+
+async function openLeaderboardScreen() {
+  const t = getCopy();
+  showScreen(elements.leaderboardScreen);
+  elements.leaderboardStatus.textContent = t.leaderboardLoading;
+  renderLeaderboardRows([]);
+
+  if (typeof window.authGetLeaderboard !== "function") {
+    elements.leaderboardStatus.textContent = t.leaderboardLoadFailed("Leaderboard API is unavailable.");
+    return;
+  }
+
+  try {
+    const rows = await window.authGetLeaderboard();
+    renderLeaderboardRows(rows);
+    elements.leaderboardStatus.textContent = "";
+  } catch (error) {
+    elements.leaderboardStatus.textContent = t.leaderboardLoadFailed(getAuthErrorMessage(error));
+  }
 }
 
 function updateAvatarMode() {
@@ -1088,6 +1172,7 @@ elements.openStampBookBtn.addEventListener("click", () => {
   renderStampBook();
   showScreen(elements.stampScreen);
 });
+elements.openLeaderboardBtn.addEventListener("click", openLeaderboardScreen);
 elements.scanSignBtn.addEventListener("click", openScanOverlay);
 elements.openStampBookFromArBtn.addEventListener("click", () => {
   state.previousScreen = "ar";
@@ -1105,6 +1190,10 @@ elements.backFromStampBtn.addEventListener("click", () => {
 
   showScreen(elements.mapScreen);
   renderMap();
+});
+elements.backFromLeaderboardBtn.addEventListener("click", () => {
+  renderStampBook();
+  showScreen(elements.stampScreen);
 });
 elements.backToMapBtn.addEventListener("click", () => {
   window.speechSynthesis.cancel();

@@ -148,5 +148,29 @@ if (!hasUsableSupabaseConfig(config)) {
         throw error;
       }
     };
+
+    window.authGetLeaderboard = async () => {
+      const [{ data: usernames, error: usernamesError }, { data: profiles, error: profilesError }] =
+        await Promise.all([
+          supabase.from("usernames").select("uid, username"),
+          supabase.from("user_profiles").select("uid, stamps")
+        ]);
+
+      if (usernamesError) {
+        throw usernamesError;
+      }
+
+      if (profilesError) {
+        throw profilesError;
+      }
+
+      const profileMap = new Map((profiles || []).map((entry) => [entry.uid, entry]));
+      return (usernames || [])
+        .map((entry) => ({
+          username: entry.username,
+          count: Array.isArray(profileMap.get(entry.uid)?.stamps) ? profileMap.get(entry.uid).stamps.length : 0
+        }))
+        .sort((a, b) => b.count - a.count || a.username.localeCompare(b.username));
+    };
   }
 }
