@@ -50,7 +50,7 @@ const texts = {
     library: "西浦图书馆",
     garden: "西浦博物馆",
     hall: "南校区体育中心",
-    mapStatusLine: "点击“启动实时定位”后，系统将获取当前位置并持续判断你与目标建筑的距离。",
+    mapStatusLine: "点击“启动实时定位”后，系统将实时显示你与 FB、CB、SD 的距离。",
     startLocationBtn: "启动实时定位",
     demoArrivalBtn: "演示模式：直接进入 AR",
     openStampBookBtn: "集章页面",
@@ -87,8 +87,8 @@ const texts = {
     stampAlreadyCollected: (code) => `${code} 印章已经收集过了。`,
     requestingLocation: "正在请求定位权限，请允许浏览器访问当前设备位置。",
     locating: "定位成功，系统正在判断你是否已进入目标建筑识别范围。",
-    noNearby: (name, meters) => `当前距离 ${name} 约 ${meters} 米。请继续靠近目标建筑，或使用演示模式直接进入 AR 页面。`,
-    arrived: (name) => `识别成功：你已到达${name}，系统正在打开 AR 讲解页面。`,
+    noNearby: () => "实时定位中，系统正在持续判断你是否进入 FB、CB、SD 的讲解范围。",
+    arrived: (name) => `已进入 ${name} 范围，系统正在播放讲解。`,
     locationDenied: "未获取到定位权限。请在浏览器中允许定位访问后重试，或使用演示模式继续展示。"
   },
   en: {
@@ -142,7 +142,7 @@ const texts = {
     library: "XJTLU Library",
     garden: "XJTLU Museum",
     hall: "South Campus Sports Centre",
-    mapStatusLine: "After starting live positioning, the system gets the current location and continuously evaluates your distance from the target building.",
+    mapStatusLine: "After live positioning starts, the system shows your distance to FB, CB, and SD in real time.",
     startLocationBtn: "Start Live Positioning",
     demoArrivalBtn: "Demo Mode: Enter AR Directly",
     openStampBookBtn: "Stamp Collection",
@@ -179,8 +179,8 @@ const texts = {
     stampAlreadyCollected: (code) => `${code} stamp has already been collected.`,
     requestingLocation: "Requesting location permission. Please allow the browser to access the current device position.",
     locating: "Location received. The system is checking whether you have entered the recognition range of the target building.",
-    noNearby: (name, meters) => `You are about ${meters} meters away from ${name}. Please continue approaching the target building, or use demo mode to enter the AR page directly.`,
-    arrived: (name) => `Recognition successful: you have arrived at ${name}. The system is now opening the AR explanation page.`,
+    noNearby: () => "Live positioning is running. The system is continuously checking whether you have entered the narration range of FB, CB, or SD.",
+    arrived: (name) => `You have entered the ${name} range. The narration is now starting.`,
     locationDenied: "Location permission was not granted. Please allow location access in the browser and try again, or use demo mode to continue the presentation."
   }
 };
@@ -229,9 +229,9 @@ const poiNarration = {
 };
 
 const pois = [
-  { id: "library", nameKey: "library", lat: 31.2752, lon: 120.7419, radius: 160 },
-  { id: "garden", nameKey: "garden", lat: 31.2748, lon: 120.7425, radius: 150 },
-  { id: "hall", nameKey: "hall", lat: 31.2744, lon: 120.7432, radius: 170 }
+  { id: "library", code: "FB", nameKey: "library", lat: 31.2765683, lon: 120.7337931, radius: 85 },
+  { id: "garden", code: "CB", nameKey: "garden", lat: 31.2749451, lon: 120.7339179, radius: 85 },
+  { id: "hall", code: "SD", nameKey: "hall", lat: 31.274314, lon: 120.735793, radius: 85 }
 ];
 
 const state = {
@@ -283,6 +283,12 @@ const elements = {
   openStampBookBtn: document.getElementById("openStampBookBtn"),
   leafletMap: document.getElementById("leafletMap"),
   mapStatusLine: document.getElementById("mapStatusLine"),
+  distanceItemFb: document.getElementById("distanceItemFb"),
+  distanceItemCb: document.getElementById("distanceItemCb"),
+  distanceItemSd: document.getElementById("distanceItemSd"),
+  distanceValueFb: document.getElementById("distanceValueFb"),
+  distanceValueCb: document.getElementById("distanceValueCb"),
+  distanceValueSd: document.getElementById("distanceValueSd"),
   backToMapBtn: document.getElementById("backToMapBtn"),
   avatarCard: document.getElementById("avatarCard"),
   avatarViewer: document.getElementById("avatarViewer"),
@@ -309,6 +315,8 @@ const elements = {
 
 let map;
 let userMarker;
+let poiMarkers = [];
+let poiLines = [];
 let watchId = null;
 let motionEnabled = false;
 let scanStream = null;
@@ -597,19 +605,37 @@ function createMapIcon(className) {
   });
 }
 
+function createPoiIcon(code) {
+  return L.divIcon({
+    className: "",
+    html: `<div class="map-poi-chip">${code}</div>`,
+    iconSize: [44, 32],
+    iconAnchor: [22, 16]
+  });
+}
+
 function renderMap() {
   if (!map) {
     map = L.map(elements.leafletMap, {
       zoomControl: true,
       attributionControl: true
-    }).setView([31.2749, 120.7425], 17);
+    }).setView([31.27545, 120.73455], 17);
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
       attribution: "&copy; OpenStreetMap contributors"
     }).addTo(map);
+
+    poiMarkers = pois.map((poi) =>
+      L.marker([poi.lat, poi.lon], {
+        icon: createPoiIcon(poi.code)
+      })
+        .addTo(map)
+        .bindPopup(poi.code)
+    );
   }
 
+  renderDistancePanel();
   setTimeout(() => map.invalidateSize(), 150);
 }
 
@@ -631,6 +657,46 @@ function findNearestPoi(position) {
       distance: haversineMeters(position.latitude, position.longitude, poi.lat, poi.lon)
     }))
     .sort((a, b) => a.distance - b.distance)[0];
+}
+
+function getDistanceElementSet(code) {
+  if (code === "FB") {
+    return { item: elements.distanceItemFb, value: elements.distanceValueFb };
+  }
+  if (code === "CB") {
+    return { item: elements.distanceItemCb, value: elements.distanceValueCb };
+  }
+  return { item: elements.distanceItemSd, value: elements.distanceValueSd };
+}
+
+function renderDistancePanel(position = null) {
+  pois.forEach((poi) => {
+    const refs = getDistanceElementSet(poi.code);
+    if (!position) {
+      refs.item.classList.remove("in-range");
+      refs.value.textContent = "--";
+      return;
+    }
+
+    const distance = haversineMeters(position.latitude, position.longitude, poi.lat, poi.lon);
+    refs.value.textContent = state.language === "zh" ? `${distance} 米` : `${distance} m`;
+    refs.item.classList.toggle("in-range", distance <= poi.radius);
+  });
+}
+
+function renderPoiLines(position) {
+  poiLines.forEach((line) => line.remove());
+  poiLines = [];
+
+  const userLatLng = [position.latitude, position.longitude];
+  poiLines = pois.map((poi) =>
+    L.polyline([userLatLng, [poi.lat, poi.lon]], {
+      color: "#c9b3ff",
+      weight: 2,
+      opacity: 0.8,
+      dashArray: "8 10"
+    }).addTo(map)
+  );
 }
 
 function speakNarration() {
@@ -820,15 +886,15 @@ async function runOcrOnCanvas() {
     const stampPasses = await Promise.all([
       recognizeText(binaryLightCanvas, "eng", {
         tessedit_pageseg_mode: "8",
-        tessedit_char_whitelist: "CBSDMcbsdm"
+        tessedit_char_whitelist: "CBSDFcbsdf"
       }),
       recognizeText(binaryDarkCanvas, "eng", {
         tessedit_pageseg_mode: "8",
-        tessedit_char_whitelist: "CBSDMcbsdm"
+        tessedit_char_whitelist: "CBSDFcbsdf"
       }),
       recognizeText(sourceCanvas, "eng", {
         tessedit_pageseg_mode: "8",
-        tessedit_char_whitelist: "CBSDMcbsdm"
+        tessedit_char_whitelist: "CBSDFcbsdf"
       })
     ]);
 
@@ -916,7 +982,7 @@ function closeScanOverlay() {
 
 function handleArrival(poi) {
   state.activePoi = poi;
-  elements.mapStatusLine.textContent = getCopy().arrived(getCopy()[poi.nameKey]);
+  elements.mapStatusLine.textContent = getCopy().arrived(poi.code);
   setTimeout(() => {
     openArScreen(poi);
   }, 900);
@@ -925,7 +991,7 @@ function handleArrival(poi) {
 function handleLocationSuccess(position) {
   const t = getCopy();
   const nearest = findNearestPoi(position.coords);
-  elements.mapStatusLine.textContent = `${t.locating} ${position.coords.latitude.toFixed(5)}, ${position.coords.longitude.toFixed(5)}`;
+  elements.mapStatusLine.textContent = t.noNearby();
 
   const latLng = [position.coords.latitude, position.coords.longitude];
   if (!userMarker) {
@@ -935,6 +1001,8 @@ function handleLocationSuccess(position) {
   } else {
     userMarker.setLatLng(latLng);
   }
+  renderDistancePanel(position.coords);
+  renderPoiLines(position.coords);
   map.flyTo(latLng, Math.max(map.getZoom(), 18), { duration: 0.8 });
 
   if (nearest.distance <= nearest.poi.radius) {
@@ -943,9 +1011,6 @@ function handleLocationSuccess(position) {
       watchId = null;
     }
     handleArrival(nearest.poi);
-  } else {
-    state.activePoi = nearest.poi;
-    elements.mapStatusLine.textContent = t.noNearby(t[nearest.poi.nameKey], nearest.distance);
   }
 }
 
@@ -956,6 +1021,7 @@ function handleLocationError() {
 function requestLocation() {
   renderMap();
   elements.mapStatusLine.textContent = getCopy().requestingLocation;
+  renderDistancePanel();
 
   if (!navigator.geolocation) {
     handleLocationError();
@@ -976,6 +1042,7 @@ function requestLocation() {
 elements.languageSelect.addEventListener("change", (event) => {
   state.language = event.target.value;
   applyTranslations();
+  renderDistancePanel();
 });
 
 elements.goRoleBtn.addEventListener("click", () => {
