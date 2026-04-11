@@ -6,9 +6,9 @@ const texts = {
       "本系统面向校园参观与信息导览场景设计。用户将依次完成语言选择、身份确认、地图定位与 AR 讲解体验，在到达目标建筑后自动进入沉浸式介绍页面。",
     languageLabel: "语言",
     goRoleBtn: "进入注册",
-    registerKicker: "Firebase Registration",
+    registerKicker: "Supabase Authentication",
     registerTitle: "创建账户",
-    registerText: "请先通过 Firebase Authentication 完成注册，再进入后续校园导览流程。",
+    registerText: "请先完成注册，再进入后续校园导览流程。",
     registerModeBtn: "注册",
     loginModeBtn: "登录",
     nameLabel: "用户名",
@@ -29,7 +29,7 @@ const texts = {
     registerMismatch: "两次输入的密码不一致。",
     registerWeak: "密码长度至少需要 6 位。",
     registerSuccess: "注册成功，现在进入身份选择页面。",
-    firebaseNotReady: "Firebase 尚未配置完成。请先在 firebase-config.js 中填写你自己的项目参数。",
+    authNotReady: "Supabase 尚未配置完成。请先在 supabase-config.js 中填写你自己的项目参数。",
     usernameTaken: "该用户名已被占用，请更换一个用户名。",
     invalidCredentials: "用户名不存在，或密码不正确。",
     registerFailed: (message) => `注册失败：${message}`,
@@ -82,9 +82,9 @@ const texts = {
       "This system is designed for campus visiting and information guidance scenarios. Users proceed through language selection, identity confirmation, map-based positioning, and AR explanation, then automatically enter an immersive building introduction page upon arrival.",
     languageLabel: "Language",
     goRoleBtn: "Go To Registration",
-    registerKicker: "Firebase Registration",
+    registerKicker: "Supabase Authentication",
     registerTitle: "Create Your Account",
-    registerText: "Register with Firebase Authentication before entering the campus guide flow.",
+    registerText: "Register before entering the campus guide flow.",
     registerModeBtn: "Register",
     loginModeBtn: "Login",
     nameLabel: "Username",
@@ -105,7 +105,7 @@ const texts = {
     registerMismatch: "The two passwords do not match.",
     registerWeak: "Password must be at least 6 characters long.",
     registerSuccess: "Registration succeeded. Continue to identity selection.",
-    firebaseNotReady: "Firebase is not configured yet. Replace the placeholder values in firebase-config.js first.",
+    authNotReady: "Supabase is not configured yet. Replace the placeholder values in supabase-config.js first.",
     usernameTaken: "This username is already taken. Please choose another one.",
     invalidCredentials: "The username does not exist, or the password is incorrect.",
     registerFailed: (message) => `Registration failed: ${message}`,
@@ -417,16 +417,19 @@ function setAuthMode(mode) {
   syncAuthModeUi();
 }
 
-function getFirebaseErrorMessage(error) {
+function getAuthErrorMessage(error) {
   const code = error?.code || "";
   const messages = {
     "auth/username-already-in-use": getCopy().usernameTaken,
-    "auth/email-already-in-use": getCopy().usernameTaken,
+    "23505": getCopy().usernameTaken,
+    "email_exists": getCopy().usernameTaken,
     "auth/weak-password": state.language === "zh" ? "密码强度不足，请至少使用 6 位字符。" : "Password is too weak. Use at least 6 characters.",
     "auth/network-request-failed": state.language === "zh" ? "网络请求失败，请检查网络连接。" : "Network request failed. Check your connection.",
     "auth/invalid-credential": getCopy().invalidCredentials,
     "auth/user-not-found": getCopy().invalidCredentials,
-    "auth/wrong-password": getCopy().invalidCredentials
+    "auth/wrong-password": getCopy().invalidCredentials,
+    "invalid_credentials": getCopy().invalidCredentials,
+    "email_not_confirmed": state.language === "zh" ? "Supabase 邮箱确认尚未关闭，请在控制台关闭确认邮箱后再试。" : "Email confirmation is still enabled in Supabase. Disable email confirmation in the dashboard and try again."
   };
   return messages[code] || error?.message || "Unknown error.";
 }
@@ -438,8 +441,8 @@ async function submitRegistration() {
   const isRegister = state.authMode === "register";
   const confirmPassword = elements.confirmPasswordInput.value;
 
-  if (!window.firebaseAuthState?.ready) {
-    elements.registerStatus.textContent = t.firebaseNotReady;
+  if (!window.authProviderState?.ready) {
+    elements.registerStatus.textContent = t.authNotReady;
     return;
   }
 
@@ -468,13 +471,13 @@ async function submitRegistration() {
 
   try {
     const user = isRegister
-      ? await window.firebaseRegister({ name, password })
-      : await window.firebaseLogin({ name, password });
+      ? await window.authRegister({ name, password })
+      : await window.authLogin({ name, password });
     state.registeredUser = user;
     elements.registerStatus.textContent = isRegister ? t.registerSuccess : t.loginSuccess;
     showScreen(elements.roleScreen);
   } catch (error) {
-    elements.registerStatus.textContent = t.registerFailed(getFirebaseErrorMessage(error));
+    elements.registerStatus.textContent = t.registerFailed(getAuthErrorMessage(error));
   } finally {
     elements.registerSubmitBtn.disabled = false;
   }
