@@ -1,5 +1,3 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
 function hasUsableSupabaseConfig(config) {
   return Boolean(
     config &&
@@ -34,79 +32,89 @@ if (!hasUsableSupabaseConfig(config)) {
     message: "Supabase config is missing. Replace the placeholder values in supabase-config.js."
   };
 } else {
-  const supabase = createClient(config.url, config.anonKey);
+  const { createClient } = window.supabase;
 
-  window.authProviderState = {
-    ready: true,
-    provider: "supabase",
-    message: ""
-  };
+  if (typeof createClient !== "function") {
+    window.authProviderState = {
+      ready: false,
+      provider: "supabase",
+      message: "Supabase SDK failed to load."
+    };
+  } else {
+    const supabase = createClient(config.url, config.anonKey);
 
-  window.authRegister = async ({ name, password }) => {
-    const trimmedName = name.trim();
-    const normalizedUsername = normalizeUsername(trimmedName);
+    window.authProviderState = {
+      ready: true,
+      provider: "supabase",
+      message: ""
+    };
 
-    const { data: existingRows, error: existingError } = await supabase
-      .from("usernames")
-      .select("normalized_username")
-      .eq("normalized_username", normalizedUsername)
-      .limit(1);
+    window.authRegister = async ({ name, password }) => {
+      const trimmedName = name.trim();
+      const normalizedUsername = normalizeUsername(trimmedName);
 
-    if (existingError) {
-      throw existingError;
-    }
+      const { data: existingRows, error: existingError } = await supabase
+        .from("usernames")
+        .select("normalized_username")
+        .eq("normalized_username", normalizedUsername)
+        .limit(1);
 
-    if (existingRows?.length) {
-      throw Object.assign(new Error("Username already exists."), {
-        code: "auth/username-already-in-use"
-      });
-    }
-
-    const email = usernameToEmail(trimmedName);
-    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          username: trimmedName,
-          normalized_username: normalizedUsername
-        }
+      if (existingError) {
+        throw existingError;
       }
-    });
 
-    if (signUpError) {
-      throw signUpError;
-    }
+      if (existingRows?.length) {
+        throw Object.assign(new Error("Username already exists."), {
+          code: "auth/username-already-in-use"
+        });
+      }
 
-    const user = signUpData.user;
-    if (!user) {
-      throw new Error("Supabase did not return a user.");
-    }
+      const email = usernameToEmail(trimmedName);
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            username: trimmedName,
+            normalized_username: normalizedUsername
+          }
+        }
+      });
 
-    const { error: insertError } = await supabase.from("usernames").insert({
-      uid: user.id,
-      username: trimmedName,
-      normalized_username: normalizedUsername
-    });
+      if (signUpError) {
+        throw signUpError;
+      }
 
-    if (insertError) {
-      throw insertError;
-    }
+      const user = signUpData.user;
+      if (!user) {
+        throw new Error("Supabase did not return a user.");
+      }
 
-    return user;
-  };
+      const { error: insertError } = await supabase.from("usernames").insert({
+        uid: user.id,
+        username: trimmedName,
+        normalized_username: normalizedUsername
+      });
 
-  window.authLogin = async ({ name, password }) => {
-    const email = usernameToEmail(name);
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
+      if (insertError) {
+        throw insertError;
+      }
 
-    if (error) {
-      throw error;
-    }
+      return user;
+    };
 
-    return data.user;
-  };
+    window.authLogin = async ({ name, password }) => {
+      const email = usernameToEmail(name);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      return data.user;
+    };
+  }
 }
