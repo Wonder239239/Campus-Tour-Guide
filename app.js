@@ -33,6 +33,9 @@ const texts = {
     usernameTaken: "该用户名已被占用，请更换一个用户名。",
     invalidCredentials: "用户名不存在，或密码不正确。",
     registerFailed: (message) => `注册失败：${message}`,
+    roleSaving: "正在保存身份信息，请稍候。",
+    roleSaveFailed: (message) => `身份保存失败：${message}`,
+    roleLoaded: (role) => `已读取你的身份：${role === "student" ? "学生" : "访客"}。系统将直接进入地图定位页面。`,
     roleKicker: "User Identity",
     roleTitle: "请选择用户身份",
     roleText: "系统将根据不同用户类型展示统一的导览流程，并在下一步进入校园地图与实时定位页面。",
@@ -109,6 +112,9 @@ const texts = {
     usernameTaken: "This username is already taken. Please choose another one.",
     invalidCredentials: "The username does not exist, or the password is incorrect.",
     registerFailed: (message) => `Registration failed: ${message}`,
+    roleSaving: "Saving your identity. Please wait.",
+    roleSaveFailed: (message) => `Failed to save identity: ${message}`,
+    roleLoaded: (role) => `Your saved identity is ${role === "student" ? "Student" : "Visitor"}. Opening the map page directly.`,
     roleKicker: "User Identity",
     roleTitle: "Select User Identity",
     roleText: "The system presents a unified guidance flow for different user groups and then enters the campus map and live positioning page.",
@@ -474,8 +480,18 @@ async function submitRegistration() {
       ? await window.authRegister({ name, password })
       : await window.authLogin({ name, password });
     state.registeredUser = user;
-    elements.registerStatus.textContent = isRegister ? t.registerSuccess : t.loginSuccess;
-    showScreen(elements.roleScreen);
+    const profile = typeof window.authGetProfile === "function" ? await window.authGetProfile(user.id) : null;
+
+    if (profile?.role) {
+      state.role = profile.role;
+      elements.roleChips.forEach((chip) => chip.classList.toggle("active", chip.dataset.role === state.role));
+      elements.registerStatus.textContent = t.roleLoaded(profile.role);
+      showScreen(elements.mapScreen);
+      renderMap();
+    } else {
+      elements.registerStatus.textContent = isRegister ? t.registerSuccess : t.loginSuccess;
+      showScreen(elements.roleScreen);
+    }
   } catch (error) {
     elements.registerStatus.textContent = t.registerFailed(getAuthErrorMessage(error));
   } finally {
@@ -763,11 +779,30 @@ elements.roleChips.forEach((chip) => {
 
 elements.backToIntroBtn.addEventListener("click", () => showScreen(elements.registerScreen));
 
-elements.goMapBtn.addEventListener("click", () => {
+elements.goMapBtn.addEventListener("click", async () => {
   if (!state.role) {
     elements.selectionHint.textContent = getCopy().selectionHint;
     return;
   }
+
+  if (state.registeredUser?.id && typeof window.authSaveProfile === "function") {
+    elements.goMapBtn.disabled = true;
+    elements.selectionHint.textContent = getCopy().roleSaving;
+
+    try {
+      await window.authSaveProfile({
+        uid: state.registeredUser.id,
+        role: state.role
+      });
+    } catch (error) {
+      elements.selectionHint.textContent = getCopy().roleSaveFailed(getAuthErrorMessage(error));
+      elements.goMapBtn.disabled = false;
+      return;
+    } finally {
+      elements.goMapBtn.disabled = false;
+    }
+  }
+
   showScreen(elements.mapScreen);
   renderMap();
 });

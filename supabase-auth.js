@@ -116,5 +116,36 @@ if (!hasUsableSupabaseConfig(config)) {
 
       return data.user;
     };
+
+    window.authGetProfile = async (uid) => {
+      const { data, error } = await supabase
+        .from("user_profiles")
+        .select("role")
+        .eq("uid", uid)
+        .maybeSingle();
+
+      if (error) {
+        throw error;
+      }
+
+      return data;
+    };
+
+    window.authSaveProfile = async ({ uid, role }) => {
+      const { error } = await supabase.from("user_profiles").upsert(
+        {
+          uid,
+          role,
+          updated_at: new Date().toISOString()
+        },
+        {
+          onConflict: "uid"
+        }
+      );
+
+      if (error) {
+        throw error;
+      }
+    };
   }
 }
