@@ -455,7 +455,7 @@ function renderLeaderboardRows(rows) {
     rows
       .map(
         (entry, index) => `
-          <div class="leaderboard-row">
+          <div class="leaderboard-row${index < 3 ? ` rank-top-${index + 1}` : ""}">
             <span class="leaderboard-rank">#${index + 1}</span>
             <span>${entry.username}</span>
             <span class="leaderboard-count">${t.leaderboardCount(entry.count)}</span>
