@@ -268,6 +268,13 @@ select:focus {
   justify-content: space-between;
 }
 
+.auth-actions {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .chip-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -804,6 +811,10 @@ model-viewer {
   }
 
   .role-actions {
+    grid-template-columns: auto auto;
+  }
+
+  .auth-actions {
     grid-template-columns: auto auto;
   }
 
