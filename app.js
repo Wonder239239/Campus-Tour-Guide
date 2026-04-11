@@ -65,11 +65,12 @@ const texts = {
     motionDenied: "设备未授予体感权限，无法启用倾斜跟随。",
     motionUnsupported: "当前设备或浏览器不支持体感倾斜控制。",
     scanKicker: "OCR Trigger",
-    scanTitle: "扫描建筑标示牌",
+    scanTitle: "扫描印章代码",
     scanSignBtn: "扫描标示牌",
     openStampBookFromArBtn: "集章页面",
-    ocrStatus: "点击下方按钮打开扫描模式。系统会通过 OCR 自动识别标示牌文字，并触发对应建筑的讲解动画。",
-    scanOverlayText: "请将建筑标示牌置于扫描框内，系统会自动进行 OCR 识别。",
+    ocrStatus: "点击下方按钮打开扫描模式。系统会优先识别 CB、SD、MB 三种印章代码，并自动完成集章。",
+    scanOverlayText: "请将 CB、SD 或 MB 代码完整置于扫描框中央，系统会自动识别并收集印章。",
+    scanFrameLabel: "请将 CB / SD / MB 置于框内中央",
     scanDebugPrefix: "OCR 识别结果：",
     closeScanBtn: "关闭扫描",
     ocrProcessing: "正在识别标示牌文字，请稍候。",
@@ -159,12 +160,13 @@ const texts = {
     motionDenied: "Motion permission was not granted, so tilt-follow cannot be enabled.",
     motionUnsupported: "This device or browser does not support motion-based tilt control.",
     scanKicker: "OCR Trigger",
-    scanTitle: "Scan Building Sign",
+    scanTitle: "Scan Stamp Code",
     scanSignBtn: "Scan Sign",
     openStampBookFromArBtn: "Stamp Collection",
     ocrStatus:
-      "Tap the button below to open scan mode. OCR text recognition runs automatically and triggers the matching building explanation animation.",
-    scanOverlayText: "Align the building sign inside the frame. OCR scanning runs automatically.",
+      "Open scan mode to detect the CB, SD, and MB stamp codes. Matching codes will be collected automatically.",
+    scanOverlayText: "Place the full CB, SD, or MB code in the middle of the frame. Scanning runs automatically.",
+    scanFrameLabel: "Align CB / SD / MB in the center",
     scanDebugPrefix: "OCR reads:",
     closeScanBtn: "Close Scan",
     ocrProcessing: "Recognizing sign text. Please wait.",
@@ -357,6 +359,7 @@ const translatableIds = [
   "scanSignBtn",
   "openStampBookFromArBtn",
   "scanOverlayText",
+  "scanFrameLabel",
   "closeScanBtn",
   "ocrStatus",
   "playAudioBtn",
@@ -707,6 +710,39 @@ async function collectStamp(stampMatch) {
   return true;
 }
 
+function buildOcrCanvas(video, sx, sy, cropWidth, cropHeight, options = {}) {
+  const { scale = 2, threshold = null } = options;
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  canvas.width = cropWidth * scale;
+  canvas.height = cropHeight * scale;
+
+  ctx.drawImage(video, sx, sy, cropWidth, cropHeight, 0, 0, canvas.width, canvas.height);
+
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+
+  for (let i = 0; i < data.length; i += 4) {
+    const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+    const contrasted = Math.max(0, Math.min(255, (gray - 128) * 1.35 + 128));
+    const value = threshold === null ? contrasted : contrasted > threshold ? 255 : 0;
+    data[i] = value;
+    data[i + 1] = value;
+    data[i + 2] = value;
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+  return canvas;
+}
+
+async function recognizeText(canvas, lang, options = {}) {
+  const result = await window.Tesseract.recognize(canvas, lang, options);
+  return {
+    text: result.data.text || "",
+    confidence: Number(result.data.confidence || 0)
+  };
+}
+
 async function runOcrOnImage(file) {
   const t = getCopy();
   elements.ocrStatus.textContent = t.ocrProcessing;
@@ -760,60 +796,62 @@ async function runOcrOnCanvas() {
   const t = getCopy();
   elements.ocrStatus.textContent = t.ocrProcessing;
 
-  const canvas = elements.scanCanvas;
-  const ctx = canvas.getContext("2d");
   const cropWidth = Math.round(videoWidth * 0.72);
   const cropHeight = Math.round(videoHeight * 0.28);
   const sx = Math.round((videoWidth - cropWidth) / 2);
   const sy = Math.round((videoHeight - cropHeight) / 2);
 
-  const scale = 2;
-  canvas.width = cropWidth * scale;
-  canvas.height = cropHeight * scale;
-  ctx.drawImage(
-    elements.scanVideo,
-    sx,
-    sy,
-    cropWidth,
-    cropHeight,
-    0,
-    0,
-    canvas.width,
-    canvas.height
-  );
-
-  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  const data = imageData.data;
-  for (let i = 0; i < data.length; i += 4) {
-    const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
-    const boosted = gray > 145 ? 255 : 0;
-    data[i] = boosted;
-    data[i + 1] = boosted;
-    data[i + 2] = boosted;
-  }
-  ctx.putImageData(imageData, 0, 0);
+  const sourceCanvas = buildOcrCanvas(elements.scanVideo, sx, sy, cropWidth, cropHeight, {
+    scale: 2,
+    threshold: null
+  });
+  const binaryLightCanvas = buildOcrCanvas(elements.scanVideo, sx, sy, cropWidth, cropHeight, {
+    scale: 2,
+    threshold: 152
+  });
+  const binaryDarkCanvas = buildOcrCanvas(elements.scanVideo, sx, sy, cropWidth, cropHeight, {
+    scale: 2,
+    threshold: 128
+  });
 
   try {
-    const stampResult = await window.Tesseract.recognize(canvas, "eng", {
-      tessedit_pageseg_mode: "8",
-      tessedit_char_whitelist: "CBSDMcbsdm"
-    });
-    const stampText = stampResult.data.text || "";
-    elements.scanDebugText.textContent = `${t.scanDebugPrefix} ${stampText.trim() || "N/A"}`;
-    const matchedStamp = matchStampFromText(stampText);
-    if (matchedStamp) {
-      await collectStamp(matchedStamp);
-      closeScanOverlay();
-      return;
+    const stampPasses = await Promise.all([
+      recognizeText(binaryLightCanvas, "eng", {
+        tessedit_pageseg_mode: "8",
+        tessedit_char_whitelist: "CBSDMcbsdm"
+      }),
+      recognizeText(binaryDarkCanvas, "eng", {
+        tessedit_pageseg_mode: "8",
+        tessedit_char_whitelist: "CBSDMcbsdm"
+      }),
+      recognizeText(sourceCanvas, "eng", {
+        tessedit_pageseg_mode: "8",
+        tessedit_char_whitelist: "CBSDMcbsdm"
+      })
+    ]);
+
+    const bestStampPass = stampPasses.sort((a, b) => b.confidence - a.confidence)[0];
+    elements.scanDebugText.textContent = `${t.scanDebugPrefix} ${bestStampPass.text.trim() || "N/A"}`;
+
+    for (const pass of stampPasses) {
+      const matchedStamp = matchStampFromText(pass.text);
+      if (matchedStamp) {
+        await collectStamp(matchedStamp);
+        closeScanOverlay();
+        return;
+      }
     }
 
     const lang = state.language === "zh" ? "eng+chi_sim" : "eng";
-    const result = await window.Tesseract.recognize(canvas, lang, {
-      tessedit_pageseg_mode: "7"
-    });
-    const text = result.data.text || "";
-    elements.scanDebugText.textContent = `${t.scanDebugPrefix} ${text.trim() || "N/A"}`;
-    const matchedPoi = matchPoiFromText(text);
+    const textPasses = await Promise.all([
+      recognizeText(sourceCanvas, lang, { tessedit_pageseg_mode: "6" }),
+      recognizeText(binaryLightCanvas, lang, { tessedit_pageseg_mode: "7" }),
+      recognizeText(binaryDarkCanvas, lang, { tessedit_pageseg_mode: "7" })
+    ]);
+
+    const bestTextPass = textPasses.sort((a, b) => b.confidence - a.confidence)[0];
+    elements.scanDebugText.textContent = `${t.scanDebugPrefix} ${bestTextPass.text.trim() || "N/A"}`;
+    const matchedPoi = matchPoiFromText(bestTextPass.text);
 
     if (matchedPoi) {
       state.activePoi = matchedPoi;
@@ -821,7 +859,10 @@ async function runOcrOnCanvas() {
       elements.ocrStatus.textContent = t.ocrMatched(getCopy()[matchedPoi.nameKey]);
       closeScanOverlay();
       speakNarration();
+      return;
     }
+
+    elements.ocrStatus.textContent = `${t.ocrNoMatch} OCR: ${bestTextPass.text.trim().slice(0, 80) || "N/A"}`;
   } finally {
     scanBusy = false;
   }
