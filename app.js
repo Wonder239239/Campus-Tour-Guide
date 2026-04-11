@@ -654,14 +654,21 @@ function matchPoiFromText(rawText) {
 }
 
 function matchStampFromText(rawText) {
-  const text = ` ${rawText.toLowerCase().replace(/\s+/g, " ")} `;
+  const normalized = rawText
+    .toLowerCase()
+    .replace(/[|!]/g, "i")
+    .replace(/8/g, "b")
+    .replace(/5/g, "s")
+    .replace(/0/g, "o")
+    .replace(/[^a-z0-9]/g, "");
+
   const matchers = [
-    { id: "cb", code: "CB", keywords: [" cb "] },
-    { id: "sd", code: "SD", keywords: [" sd "] },
-    { id: "mb", code: "MB", keywords: [" mb "] }
+    { id: "cb", code: "CB", patterns: [/cb/, /c[b8]/, /[c(]b/] },
+    { id: "sd", code: "SD", patterns: [/sd/, /s[d0]/] },
+    { id: "mb", code: "MB", patterns: [/mb/, /m[b8]/] }
   ];
 
-  return matchers.find((entry) => entry.keywords.some((keyword) => text.includes(keyword))) || null;
+  return matchers.find((entry) => entry.patterns.some((pattern) => pattern.test(normalized))) || null;
 }
 
 async function persistProfile() {
@@ -753,7 +760,7 @@ async function runOcrOnCanvas() {
   const canvas = elements.scanCanvas;
   const ctx = canvas.getContext("2d");
   const cropWidth = Math.round(videoWidth * 0.72);
-  const cropHeight = Math.round(videoHeight * 0.18);
+  const cropHeight = Math.round(videoHeight * 0.28);
   const sx = Math.round((videoWidth - cropWidth) / 2);
   const sy = Math.round((videoHeight - cropHeight) / 2);
 
