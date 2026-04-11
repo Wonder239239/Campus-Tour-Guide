@@ -560,6 +560,14 @@ model-viewer {
   line-height: 1.6;
 }
 
+.scan-debug-text {
+  margin: 0;
+  font-size: 0.88rem;
+  color: rgba(216, 203, 255, 0.92);
+  line-height: 1.5;
+  word-break: break-word;
+}
+
 .hidden {
   display: none !important;
 }

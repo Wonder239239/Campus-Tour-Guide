@@ -70,6 +70,7 @@ const texts = {
     openStampBookFromArBtn: "集章页面",
     ocrStatus: "点击下方按钮打开扫描模式。系统会通过 OCR 自动识别标示牌文字，并触发对应建筑的讲解动画。",
     scanOverlayText: "请将建筑标示牌置于扫描框内，系统会自动进行 OCR 识别。",
+    scanDebugPrefix: "OCR 识别结果：",
     closeScanBtn: "关闭扫描",
     ocrProcessing: "正在识别标示牌文字，请稍候。",
     ocrNoMatch: "未识别到可匹配的建筑名称。请尽量让标示牌文字更清晰。",
@@ -164,6 +165,7 @@ const texts = {
     ocrStatus:
       "Tap the button below to open scan mode. OCR text recognition runs automatically and triggers the matching building explanation animation.",
     scanOverlayText: "Align the building sign inside the frame. OCR scanning runs automatically.",
+    scanDebugPrefix: "OCR reads:",
     closeScanBtn: "Close Scan",
     ocrProcessing: "Recognizing sign text. Please wait.",
     ocrNoMatch: "No matching building name was recognized. Try to make the sign text clearer.",
@@ -296,6 +298,7 @@ const elements = {
   scanVideo: document.getElementById("scanVideo"),
   scanCanvas: document.getElementById("scanCanvas"),
   scanOverlayText: document.getElementById("scanOverlayText"),
+  scanDebugText: document.getElementById("scanDebugText"),
   closeScanBtn: document.getElementById("closeScanBtn"),
   playAudioBtn: document.getElementById("playAudioBtn"),
   stopAudioBtn: document.getElementById("stopAudioBtn"),
@@ -772,6 +775,7 @@ async function runOcrOnCanvas() {
     const lang = state.language === "zh" ? "eng+chi_sim" : "eng";
     const result = await window.Tesseract.recognize(canvas, lang);
     const text = result.data.text || "";
+    elements.scanDebugText.textContent = `${t.scanDebugPrefix} ${text.trim() || "N/A"}`;
     const matchedStamp = matchStampFromText(text);
     if (matchedStamp) {
       await collectStamp(matchedStamp);
@@ -809,6 +813,7 @@ async function openScanOverlay() {
     elements.scanVideo.srcObject = scanStream;
     elements.scanOverlay.classList.remove("hidden");
     elements.scanOverlayText.textContent = t.scanOverlayText;
+    elements.scanDebugText.textContent = "";
 
     if (scanIntervalId) {
       clearInterval(scanIntervalId);
@@ -832,6 +837,7 @@ function closeScanOverlay() {
   }
 
   elements.scanVideo.srcObject = null;
+  elements.scanDebugText.textContent = "";
   elements.scanOverlay.classList.add("hidden");
 }
 
