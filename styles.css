@@ -312,18 +312,23 @@ select:focus {
 }
 
 .stamp-badge {
-  width: 92px;
-  height: 92px;
+  width: 112px;
+  height: 112px;
   margin: 0 auto;
   display: grid;
   place-items: center;
-  border-radius: 50%;
-  border: 2px dashed rgba(255, 255, 255, 0.28);
+  overflow: hidden;
+  border-radius: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.18);
   background: rgba(255, 255, 255, 0.04);
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 1.6rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  box-shadow: 0 10px 20px rgba(19, 10, 50, 0.2);
+}
+
+.stamp-badge-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
 }
 
 .button-row,
@@ -982,9 +987,8 @@ model-viewer {
   }
 
   .stamp-badge {
-    width: 74px;
-    height: 74px;
-    font-size: 1.25rem;
+    width: 88px;
+    height: 88px;
   }
 
   .scan-shell {
