@@ -283,6 +283,18 @@ select:focus {
   justify-content: flex-end;
 }
 
+.page-back-row {
+  justify-content: flex-end;
+  margin-top: 2px;
+}
+
+.stamp-actions {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .stamp-slot {
   display: grid;
   gap: 12px;
@@ -886,6 +898,14 @@ model-viewer {
 
   .auth-actions {
     grid-template-columns: auto auto;
+  }
+
+  .stamp-actions {
+    grid-template-columns: auto auto;
+  }
+
+  .page-back-row {
+    justify-content: flex-end;
   }
 
   .choice-chip,
