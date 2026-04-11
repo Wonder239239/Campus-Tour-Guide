@@ -79,7 +79,7 @@ const texts = {
     backFromStampBtn: "返回",
     stampNameCb: "CB 印章",
     stampNameSd: "SD 印章",
-    stampNameMb: "MB 印章",
+    stampNameFb: "FB 印章",
     stampLocked: "暂未收集",
     stampUnlocked: "已收集",
     stampSummary: (count) => `已收集 ${count} / 3 枚印章。`,
@@ -171,7 +171,7 @@ const texts = {
     backFromStampBtn: "Back",
     stampNameCb: "CB Stamp",
     stampNameSd: "SD Stamp",
-    stampNameMb: "MB Stamp",
+    stampNameFb: "FB Stamp",
     stampLocked: "Not collected yet.",
     stampUnlocked: "Collected",
     stampSummary: (count) => `${count} / 3 stamps collected.`,
@@ -248,7 +248,7 @@ const state = {
 const stampDefinitions = [
   { id: "cb", code: "CB" },
   { id: "sd", code: "SD" },
-  { id: "mb", code: "MB" }
+  { id: "fb", code: "FB" }
 ];
 
 const elements = {
@@ -301,10 +301,10 @@ const elements = {
   backFromStampBtn: document.getElementById("backFromStampBtn"),
   stampSlotCb: document.getElementById("stampSlotCb"),
   stampSlotSd: document.getElementById("stampSlotSd"),
-  stampSlotMb: document.getElementById("stampSlotMb"),
+  stampSlotFb: document.getElementById("stampSlotFb"),
   stampDescCb: document.getElementById("stampDescCb"),
   stampDescSd: document.getElementById("stampDescSd"),
-  stampDescMb: document.getElementById("stampDescMb")
+  stampDescFb: document.getElementById("stampDescFb")
 };
 
 let map;
@@ -361,7 +361,7 @@ const translatableIds = [
   "backFromStampBtn",
   "stampNameCb",
   "stampNameSd",
-  "stampNameMb"
+  "stampNameFb"
 ];
 
 function showScreen(screen) {
@@ -390,7 +390,7 @@ function renderStampBook() {
   const stampMap = {
     cb: { slot: elements.stampSlotCb, desc: elements.stampDescCb },
     sd: { slot: elements.stampSlotSd, desc: elements.stampDescSd },
-    mb: { slot: elements.stampSlotMb, desc: elements.stampDescMb }
+    fb: { slot: elements.stampSlotFb, desc: elements.stampDescFb }
   };
 
   stampDefinitions.forEach((stamp) => {
@@ -673,7 +673,7 @@ function matchStampFromText(rawText) {
   const matchers = [
     { id: "cb", code: "CB", patterns: [/cb/, /c[b8]/, /[c(]b/] },
     { id: "sd", code: "SD", patterns: [/sd/, /s[d0]/] },
-    { id: "mb", code: "MB", patterns: [/mb/, /m[b8]/] }
+    { id: "fb", code: "FB", patterns: [/fb/, /f[b8]/] }
   ];
 
   return matchers.find((entry) => entry.patterns.some((pattern) => pattern.test(normalized))) || null;
