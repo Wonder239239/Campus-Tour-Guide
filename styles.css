@@ -261,6 +261,13 @@ select:focus {
   gap: 12px;
 }
 
+.role-actions {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .chip-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -794,6 +801,10 @@ model-viewer {
 
   .button-row {
     gap: 10px;
+  }
+
+  .role-actions {
+    grid-template-columns: auto auto;
   }
 
   .choice-chip,
