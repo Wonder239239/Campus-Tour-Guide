@@ -11,26 +11,27 @@ const texts = {
     registerText: "请先通过 Firebase Authentication 完成注册，再进入后续校园导览流程。",
     registerModeBtn: "注册",
     loginModeBtn: "登录",
-    nameLabel: "姓名",
-    emailLabel: "邮箱地址",
+    nameLabel: "用户名",
     passwordLabel: "密码",
     confirmPasswordLabel: "确认密码",
-    registerStatus: "请填写完整信息，然后创建 Firebase 账户。",
+    registerStatus: "请输入用户名和密码，然后创建账户。",
     registerLoading: "正在创建账户，请稍候。",
     registerSubmitBtn: "注册并继续",
     loginTitle: "登录账户",
     loginText: "已注册用户可直接登录，然后进入后续校园导览流程。",
-    loginStatus: "请输入邮箱和密码后登录。",
+    loginStatus: "请输入用户名和密码后登录。",
     loginLoading: "正在登录，请稍候。",
     loginSubmitBtn: "登录并继续",
-    loginEmpty: "请输入邮箱和密码。",
+    loginEmpty: "请输入用户名和密码。",
     loginSuccess: "登录成功，现在进入身份选择页面。",
     backToIntroFromRegisterBtn: "返回语言页",
-    registerEmpty: "请完整填写姓名、邮箱、密码和确认密码。",
+    registerEmpty: "请完整填写用户名、密码和确认密码。",
     registerMismatch: "两次输入的密码不一致。",
     registerWeak: "密码长度至少需要 6 位。",
-    registerSuccess: "注册成功，系统已发送验证邮件。现在进入身份选择页面。",
+    registerSuccess: "注册成功，现在进入身份选择页面。",
     firebaseNotReady: "Firebase 尚未配置完成。请先在 firebase-config.js 中填写你自己的项目参数。",
+    usernameTaken: "该用户名已被占用，请更换一个用户名。",
+    invalidCredentials: "用户名不存在，或密码不正确。",
     registerFailed: (message) => `注册失败：${message}`,
     roleKicker: "User Identity",
     roleTitle: "请选择用户身份",
@@ -86,26 +87,27 @@ const texts = {
     registerText: "Register with Firebase Authentication before entering the campus guide flow.",
     registerModeBtn: "Register",
     loginModeBtn: "Login",
-    nameLabel: "Full Name",
-    emailLabel: "Email Address",
+    nameLabel: "Username",
     passwordLabel: "Password",
     confirmPasswordLabel: "Confirm Password",
-    registerStatus: "Complete all fields, then create your Firebase account.",
+    registerStatus: "Enter a username and password to create your account.",
     registerLoading: "Creating account. Please wait.",
     registerSubmitBtn: "Register And Continue",
     loginTitle: "Sign In To Your Account",
     loginText: "Existing users can sign in directly and continue to the campus guide flow.",
-    loginStatus: "Enter your email and password to sign in.",
+    loginStatus: "Enter your username and password to sign in.",
     loginLoading: "Signing in. Please wait.",
     loginSubmitBtn: "Login And Continue",
-    loginEmpty: "Please enter your email and password.",
+    loginEmpty: "Please enter your username and password.",
     loginSuccess: "Login succeeded. Continue to identity selection.",
     backToIntroFromRegisterBtn: "Back To Language",
-    registerEmpty: "Please complete name, email, password, and confirm password.",
+    registerEmpty: "Please complete username, password, and confirm password.",
     registerMismatch: "The two passwords do not match.",
     registerWeak: "Password must be at least 6 characters long.",
-    registerSuccess: "Registration succeeded. A verification email has been sent. Continue to identity selection.",
+    registerSuccess: "Registration succeeded. Continue to identity selection.",
     firebaseNotReady: "Firebase is not configured yet. Replace the placeholder values in firebase-config.js first.",
+    usernameTaken: "This username is already taken. Please choose another one.",
+    invalidCredentials: "The username does not exist, or the password is incorrect.",
     registerFailed: (message) => `Registration failed: ${message}`,
     roleKicker: "User Identity",
     roleTitle: "Select User Identity",
@@ -223,7 +225,6 @@ const elements = {
   loginModeBtn: document.getElementById("loginModeBtn"),
   nameField: document.getElementById("nameField"),
   nameInput: document.getElementById("nameInput"),
-  emailInput: document.getElementById("emailInput"),
   passwordInput: document.getElementById("passwordInput"),
   confirmPasswordField: document.getElementById("confirmPasswordField"),
   confirmPasswordInput: document.getElementById("confirmPasswordInput"),
@@ -275,7 +276,6 @@ const translatableIds = [
   "registerModeBtn",
   "loginModeBtn",
   "nameLabel",
-  "emailLabel",
   "passwordLabel",
   "confirmPasswordLabel",
   "backToIntroFromRegisterBtn",
@@ -420,20 +420,22 @@ function setAuthMode(mode) {
 function getFirebaseErrorMessage(error) {
   const code = error?.code || "";
   const messages = {
-    "auth/email-already-in-use": state.language === "zh" ? "该邮箱已被注册。" : "This email is already registered.",
-    "auth/invalid-email": state.language === "zh" ? "邮箱格式无效。" : "The email address is invalid.",
+    "auth/username-already-in-use": getCopy().usernameTaken,
+    "auth/email-already-in-use": getCopy().usernameTaken,
     "auth/weak-password": state.language === "zh" ? "密码强度不足，请至少使用 6 位字符。" : "Password is too weak. Use at least 6 characters.",
-    "auth/network-request-failed": state.language === "zh" ? "网络请求失败，请检查网络连接。" : "Network request failed. Check your connection."
+    "auth/network-request-failed": state.language === "zh" ? "网络请求失败，请检查网络连接。" : "Network request failed. Check your connection.",
+    "auth/invalid-credential": getCopy().invalidCredentials,
+    "auth/user-not-found": getCopy().invalidCredentials,
+    "auth/wrong-password": getCopy().invalidCredentials
   };
   return messages[code] || error?.message || "Unknown error.";
 }
 
 async function submitRegistration() {
   const t = getCopy();
-  const email = elements.emailInput.value.trim();
+  const name = elements.nameInput.value.trim();
   const password = elements.passwordInput.value;
   const isRegister = state.authMode === "register";
-  const name = elements.nameInput.value.trim();
   const confirmPassword = elements.confirmPasswordInput.value;
 
   if (!window.firebaseAuthState?.ready) {
@@ -442,7 +444,7 @@ async function submitRegistration() {
   }
 
   if (isRegister) {
-    if (!name || !email || !password || !confirmPassword) {
+    if (!name || !password || !confirmPassword) {
       elements.registerStatus.textContent = t.registerEmpty;
       return;
     }
@@ -456,7 +458,7 @@ async function submitRegistration() {
       elements.registerStatus.textContent = t.registerWeak;
       return;
     }
-  } else if (!email || !password) {
+  } else if (!name || !password) {
     elements.registerStatus.textContent = t.loginEmpty;
     return;
   }
@@ -466,8 +468,8 @@ async function submitRegistration() {
 
   try {
     const user = isRegister
-      ? await window.firebaseRegister({ name, email, password })
-      : await window.firebaseLogin({ email, password });
+      ? await window.firebaseRegister({ name, password })
+      : await window.firebaseLogin({ name, password });
     state.registeredUser = user;
     elements.registerStatus.textContent = isRegister ? t.registerSuccess : t.loginSuccess;
     showScreen(elements.roleScreen);
