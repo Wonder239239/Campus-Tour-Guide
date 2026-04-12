@@ -62,10 +62,11 @@ input {
 .hero-card {
   min-height: 72vh;
   display: grid;
-  align-content: center;
+  align-content: start;
   gap: 18px;
   position: relative;
   overflow: hidden;
+  padding-top: 18px;
 }
 
 .hero-card::after {
@@ -856,6 +857,11 @@ model-viewer {
   .map-card,
   .ar-card {
     padding: 18px;
+  }
+
+  .hero-card {
+    padding-top: 12px;
+    gap: 14px;
   }
 
   .screen-card {
