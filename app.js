@@ -565,6 +565,14 @@ function applyTranslations() {
       poiGarden: t.garden,
       poiHall: t.hall
     };
+    if (id === "heroTitle") {
+      const heroText = String(t.heroTitle);
+      const isZh = state.language === "zh";
+      const intro = isZh ? "欢迎使用" : "Welcome to";
+      const brand = heroText.replace(intro, "").trim() || "X·EasyGo";
+      node.innerHTML = `<span class="hero-title-intro">${intro}</span><span class="hero-title-brand">${brand}</span>`;
+      return;
+    }
     node.textContent = valueMap[id] || t[id];
   });
 

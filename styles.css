@@ -144,6 +144,29 @@ h1 {
   max-width: 10ch;
 }
 
+.hero-title {
+  display: grid;
+  gap: 8px;
+  max-width: 100%;
+}
+
+.hero-title-intro {
+  display: block;
+  font-size: clamp(1.1rem, 2.2vw, 1.45rem);
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: rgba(246, 242, 255, 0.86);
+}
+
+.hero-title-brand {
+  display: block;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(2.8rem, 7vw, 5rem);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+
 h2 {
   font-size: clamp(1.6rem, 3vw, 2.4rem);
 }
@@ -847,7 +870,20 @@ model-viewer {
 
   h1 {
     font-size: clamp(2rem, 8vw, 2.6rem);
-    max-width: 12ch;
+    max-width: 100%;
+  }
+
+  .hero-title {
+    gap: 6px;
+  }
+
+  .hero-title-intro {
+    font-size: 0.98rem;
+  }
+
+  .hero-title-brand {
+    font-size: clamp(2.4rem, 11vw, 3.2rem);
+    line-height: 0.94;
   }
 
   h2 {
