@@ -279,6 +279,14 @@ const stampDefinitions = [
   { id: "fb", code: "FB" }
 ];
 
+function normalizeCollectedStamps(stamps = []) {
+  const normalized = stamps
+    .map((stamp) => (stamp === "mb" ? "fb" : stamp))
+    .filter((stamp) => stampDefinitions.some((entry) => entry.id === stamp));
+
+  return [...new Set(normalized)];
+}
+
 const elements = {
   introScreen: document.getElementById("introScreen"),
   registerScreen: document.getElementById("registerScreen"),
@@ -658,7 +666,15 @@ async function submitRegistration() {
       : await window.authLogin({ name, password });
     state.registeredUser = user;
     const profile = typeof window.authGetProfile === "function" ? await window.authGetProfile(user.id) : null;
-    state.collectedStamps = Array.isArray(profile?.stamps) ? profile.stamps : [];
+    state.collectedStamps = normalizeCollectedStamps(Array.isArray(profile?.stamps) ? profile.stamps : []);
+
+    if (
+      Array.isArray(profile?.stamps) &&
+      JSON.stringify(state.collectedStamps) !== JSON.stringify(profile.stamps) &&
+      typeof window.authSaveProfile === "function"
+    ) {
+      await persistProfile();
+    }
 
     if (profile?.role) {
       state.role = profile.role;
@@ -840,7 +856,7 @@ async function persistProfile() {
   await window.authSaveProfile({
     uid: state.registeredUser.id,
     role: state.role || null,
-    stamps: state.collectedStamps
+    stamps: normalizeCollectedStamps(state.collectedStamps)
   });
 }
 
@@ -852,7 +868,7 @@ async function collectStamp(stampMatch) {
     return true;
   }
 
-  state.collectedStamps = [...state.collectedStamps, stampMatch.id];
+  state.collectedStamps = normalizeCollectedStamps([...state.collectedStamps, stampMatch.id]);
   renderStampBook();
   elements.ocrStatus.textContent = t.stampCollected(stampMatch.code);
 

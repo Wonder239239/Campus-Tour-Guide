@@ -23,6 +23,13 @@ function usernameToEmail(username) {
   return `user-${encoded}@xjtlu-guide.local`;
 }
 
+function normalizeStampList(stamps = []) {
+  const normalized = stamps
+    .map((stamp) => (stamp === "mb" ? "fb" : stamp))
+    .filter((stamp) => ["cb", "sd", "fb"].includes(stamp));
+  return [...new Set(normalized)];
+}
+
 const config = window.supabaseConfig;
 
 if (!hasUsableSupabaseConfig(config)) {
@@ -168,7 +175,7 @@ if (!hasUsableSupabaseConfig(config)) {
       return (usernames || [])
         .map((entry) => ({
           username: entry.username,
-          count: Array.isArray(profileMap.get(entry.uid)?.stamps) ? profileMap.get(entry.uid).stamps.length : 0
+          count: normalizeStampList(profileMap.get(entry.uid)?.stamps).length
         }))
         .sort((a, b) => b.count - a.count || a.username.localeCompare(b.username));
     };
