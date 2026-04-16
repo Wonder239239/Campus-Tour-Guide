@@ -49,6 +49,10 @@ const texts = {
     startLocationBtn: "启动实时定位",
     demoArrivalBtn: "演示模式：直接进入 AR",
     openStampBookBtn: "集章页面",
+    arrivalKicker: "定位完成",
+    arrivalTitle: "已到达目标地点",
+    arrivalMessage: "即将进入讲解页面。",
+    arrivalLocated: (name) => `已定位到 ${name}，下面进行讲解。`,
     cameraKicker: "AR Storytelling",
     cameraTitle: "虚拟讲解页面",
     backToMapBtn: "返回地图定位页",
@@ -147,6 +151,10 @@ const texts = {
     startLocationBtn: "Start Live Positioning",
     demoArrivalBtn: "Demo Mode: Enter AR Directly",
     openStampBookBtn: "Stamp Collection",
+    arrivalKicker: "Location Confirmed",
+    arrivalTitle: "Arrival Confirmed",
+    arrivalMessage: "The narration will begin shortly.",
+    arrivalLocated: (name) => `You have arrived at ${name}. The narration will begin next.`,
     cameraKicker: "AR Storytelling",
     cameraTitle: "Virtual Guide Explanation Page",
     backToMapBtn: "Back To Positioning Page",
@@ -288,6 +296,7 @@ const elements = {
   registerScreen: document.getElementById("registerScreen"),
   roleScreen: document.getElementById("roleScreen"),
   mapScreen: document.getElementById("mapScreen"),
+  arrivalScreen: document.getElementById("arrivalScreen"),
   arScreen: document.getElementById("arScreen"),
   stampScreen: document.getElementById("stampScreen"),
   leaderboardScreen: document.getElementById("leaderboardScreen"),
@@ -314,6 +323,7 @@ const elements = {
   startLocationBtn: document.getElementById("startLocationBtn"),
   demoArrivalBtn: document.getElementById("demoArrivalBtn"),
   openStampBookBtn: document.getElementById("openStampBookBtn"),
+  arrivalMessage: document.getElementById("arrivalMessage"),
   leafletMap: document.getElementById("leafletMap"),
   mapStatusLine: document.getElementById("mapStatusLine"),
   distanceItemFb: document.getElementById("distanceItemFb"),
@@ -384,6 +394,8 @@ const translatableIds = [
   "startLocationBtn",
   "demoArrivalBtn",
   "openStampBookBtn",
+  "arrivalKicker",
+  "arrivalTitle",
   "cameraKicker",
   "cameraTitle",
   "backToMapBtn",
@@ -412,7 +424,7 @@ const translatableIds = [
 ];
 
 function showScreen(screen) {
-  [elements.introScreen, elements.registerScreen, elements.roleScreen, elements.mapScreen, elements.arScreen, elements.stampScreen, elements.leaderboardScreen].forEach((node) => {
+  [elements.introScreen, elements.registerScreen, elements.roleScreen, elements.mapScreen, elements.arrivalScreen, elements.arScreen, elements.stampScreen, elements.leaderboardScreen].forEach((node) => {
     node.classList.add("hidden");
     node.classList.remove("screen-active");
   });
@@ -821,6 +833,16 @@ async function openArScreen(poi) {
   speakNarration();
 }
 
+function openArrivalScreen(poi) {
+  state.activePoi = poi;
+  const t = getCopy();
+  showScreen(elements.arrivalScreen);
+  elements.arrivalMessage.textContent = t.arrivalLocated(t[poi.nameKey]);
+  window.setTimeout(() => {
+    openArScreen(poi);
+  }, 1500);
+}
+
 function matchPoiFromText(rawText) {
   const text = rawText.toLowerCase().replace(/\s+/g, " ");
   const matchers = [
@@ -1088,9 +1110,7 @@ function closeScanOverlay() {
 function handleArrival(poi) {
   state.activePoi = poi;
   elements.mapStatusLine.textContent = getCopy().arrived(poi.code);
-  setTimeout(() => {
-    openArScreen(poi);
-  }, 900);
+  openArrivalScreen(poi);
 }
 
 function handleLocationSuccess(position) {
