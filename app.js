@@ -38,7 +38,13 @@ const texts = {
     selectionHint: "请选择身份后继续。",
     roleReady: (role) => `当前身份：${role === "student" ? "新生" : "访客"}。可进入地图定位阶段。`,
     backToIntroBtn: "返回注册页",
-    goMapBtn: "进入地图定位",
+    goMapBtn: "进入功能页面",
+    hubTitle: "功能入口",
+    hubCampusMapBtn: "Campus Map",
+    hubStampBtn: "Stamp Collection",
+    hubMessageBtn: "留言",
+    hubUserInfoBtn: "User Information",
+    backFromHubBtn: "返回",
     mapKicker: "XJTLU SIP Campus",
     mapTitle: "校园地图与实时定位",
     library: "FB（Foundation Building）",
@@ -139,7 +145,13 @@ const texts = {
     selectionHint: "Please select an identity before continuing.",
     roleReady: (role) => `Current identity: ${role === "student" ? "New Student" : "Visitor"}. You can proceed to map positioning.`,
     backToIntroBtn: "Back To Registration",
-    goMapBtn: "Enter Map Positioning",
+    goMapBtn: "Enter Service Hub",
+    hubTitle: "Service Hub",
+    hubCampusMapBtn: "Campus Map",
+    hubStampBtn: "Stamp Collection",
+    hubMessageBtn: "Message",
+    hubUserInfoBtn: "User Information",
+    backFromHubBtn: "Back",
     mapKicker: "XJTLU SIP Campus",
     mapTitle: "Campus Map And Live Positioning",
     library: "FB (Foundation Building)",
@@ -293,6 +305,7 @@ const elements = {
   introScreen: document.getElementById("introScreen"),
   registerScreen: document.getElementById("registerScreen"),
   roleScreen: document.getElementById("roleScreen"),
+  hubScreen: document.getElementById("hubScreen"),
   mapScreen: document.getElementById("mapScreen"),
   arrivalScreen: document.getElementById("arrivalScreen"),
   arScreen: document.getElementById("arScreen"),
@@ -317,6 +330,11 @@ const elements = {
   selectionHint: document.getElementById("selectionHint"),
   backToIntroBtn: document.getElementById("backToIntroBtn"),
   goMapBtn: document.getElementById("goMapBtn"),
+  hubCampusMapBtn: document.getElementById("hubCampusMapBtn"),
+  hubStampBtn: document.getElementById("hubStampBtn"),
+  hubMessageBtn: document.getElementById("hubMessageBtn"),
+  hubUserInfoBtn: document.getElementById("hubUserInfoBtn"),
+  backFromHubBtn: document.getElementById("backFromHubBtn"),
   startLocationBtn: document.getElementById("startLocationBtn"),
   demoArrivalBtn: document.getElementById("demoArrivalBtn"),
   openStampBookBtn: document.getElementById("openStampBookBtn"),
@@ -384,6 +402,12 @@ const translatableIds = [
   "selectionHint",
   "backToIntroBtn",
   "goMapBtn",
+  "hubTitle",
+  "hubCampusMapBtn",
+  "hubStampBtn",
+  "hubMessageBtn",
+  "hubUserInfoBtn",
+  "backFromHubBtn",
   "mapKicker",
   "mapTitle",
   "mapStatusLine",
@@ -420,7 +444,7 @@ const translatableIds = [
 ];
 
 function showScreen(screen) {
-  [elements.introScreen, elements.registerScreen, elements.roleScreen, elements.mapScreen, elements.arrivalScreen, elements.arScreen, elements.stampScreen, elements.leaderboardScreen].forEach((node) => {
+  [elements.introScreen, elements.registerScreen, elements.roleScreen, elements.hubScreen, elements.mapScreen, elements.arrivalScreen, elements.arScreen, elements.stampScreen, elements.leaderboardScreen].forEach((node) => {
     node.classList.add("hidden");
     node.classList.remove("screen-active");
   });
@@ -690,7 +714,7 @@ async function submitRegistration() {
       state.role = profile.role;
       elements.roleChips.forEach((chip) => chip.classList.toggle("active", chip.dataset.role === state.role));
       elements.registerStatus.textContent = t.roleLoaded(profile.role);
-      showScreen(elements.mapScreen);
+      showScreen(elements.hubScreen);
       renderMap();
     } else {
       elements.registerStatus.textContent = isRegister ? t.registerSuccess : t.loginSuccess;
@@ -1206,11 +1230,22 @@ elements.goMapBtn.addEventListener("click", async () => {
     }
   }
 
-  showScreen(elements.mapScreen);
-  renderMap();
+  showScreen(elements.hubScreen);
 });
 
 elements.startLocationBtn.addEventListener("click", requestLocation);
+elements.hubCampusMapBtn.addEventListener("click", () => {
+  showScreen(elements.mapScreen);
+  renderMap();
+});
+elements.hubStampBtn.addEventListener("click", () => {
+  state.previousScreen = "hub";
+  renderStampBook();
+  showScreen(elements.stampScreen);
+});
+elements.hubMessageBtn.addEventListener("click", () => {});
+elements.hubUserInfoBtn.addEventListener("click", () => {});
+elements.backFromHubBtn.addEventListener("click", () => showScreen(elements.roleScreen));
 elements.demoArrivalBtn.addEventListener("click", () => openArScreen(state.activePoi));
 elements.openStampBookBtn.addEventListener("click", () => {
   state.previousScreen = "map";
@@ -1230,6 +1265,11 @@ elements.stopAudioBtn.addEventListener("click", () => window.speechSynthesis.can
 elements.backFromStampBtn.addEventListener("click", () => {
   if (state.previousScreen === "ar") {
     showScreen(elements.arScreen);
+    return;
+  }
+
+  if (state.previousScreen === "hub") {
+    showScreen(elements.hubScreen);
     return;
   }
 
