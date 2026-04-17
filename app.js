@@ -1288,3 +1288,30 @@ elements.backToMapBtn.addEventListener("click", () => {
 });
 
 applyTranslations();
+function mountMapBackButton() {
+  const sourceButton =
+    document.getElementById("backToHubBtn") ||
+    document.getElementById("mapStampBtn");
+
+  if (!sourceButton || !elements.hubScreen) {
+    return;
+  }
+
+  const nextButton = sourceButton.cloneNode(true);
+  nextButton.id = "backToHubBtn";
+  nextButton.textContent = state.language === "zh" ? "返回" : "Back";
+  sourceButton.replaceWith(nextButton);
+
+  nextButton.addEventListener("click", () => {
+    showScreen(elements.hubScreen);
+  });
+}
+
+const originalApplyTranslations = applyTranslations;
+applyTranslations = function (...args) {
+  const result = originalApplyTranslations.apply(this, args);
+  mountMapBackButton();
+  return result;
+};
+
+window.addEventListener("load", mountMapBackButton);
