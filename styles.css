@@ -389,6 +389,18 @@ select:focus {
   justify-content: space-between;
 }
 
+.intro-actions {
+  margin-top: auto;
+  justify-content: center;
+  padding-top: 10px;
+}
+
+.intro-cta-btn {
+  min-width: min(100%, 320px);
+  justify-content: center;
+  padding-inline: 28px;
+}
+
 .chip-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -958,6 +970,14 @@ model-viewer {
 
   .auth-actions {
     grid-template-columns: auto auto;
+  }
+
+  .intro-actions {
+    justify-content: center;
+  }
+
+  .intro-cta-btn {
+    min-width: min(100%, 280px);
   }
 
   .stamp-actions {
