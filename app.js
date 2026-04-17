@@ -840,7 +840,7 @@ function openArrivalScreen(poi) {
   elements.arrivalMessage.textContent = t.arrivalLocated(t[poi.nameKey]);
   window.setTimeout(() => {
     openArScreen(poi);
-  }, 1500);
+  }, 5000);
 }
 
 function matchPoiFromText(rawText) {
