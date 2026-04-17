@@ -41,7 +41,6 @@ const texts = {
     goMapBtn: "进入地图定位",
     mapKicker: "XJTLU SIP Campus",
     mapTitle: "校园地图与实时定位",
-    backToRoleBtn: "返回身份页",
     library: "FB（Foundation Building）",
     garden: "CB（Central Building）",
     hall: "SD（Science Building D）",
@@ -143,7 +142,6 @@ const texts = {
     goMapBtn: "Enter Map Positioning",
     mapKicker: "XJTLU SIP Campus",
     mapTitle: "Campus Map And Live Positioning",
-    backToRoleBtn: "Back To Identity",
     library: "FB (Foundation Building)",
     garden: "CB (Central Building)",
     hall: "SD (Science Building D)",
@@ -319,7 +317,6 @@ const elements = {
   selectionHint: document.getElementById("selectionHint"),
   backToIntroBtn: document.getElementById("backToIntroBtn"),
   goMapBtn: document.getElementById("goMapBtn"),
-  backToRoleBtn: document.getElementById("backToRoleBtn"),
   startLocationBtn: document.getElementById("startLocationBtn"),
   demoArrivalBtn: document.getElementById("demoArrivalBtn"),
   openStampBookBtn: document.getElementById("openStampBookBtn"),
@@ -389,7 +386,6 @@ const translatableIds = [
   "goMapBtn",
   "mapKicker",
   "mapTitle",
-  "backToRoleBtn",
   "mapStatusLine",
   "startLocationBtn",
   "demoArrivalBtn",
@@ -1214,7 +1210,6 @@ elements.goMapBtn.addEventListener("click", async () => {
   renderMap();
 });
 
-elements.backToRoleBtn.addEventListener("click", () => showScreen(elements.roleScreen));
 elements.startLocationBtn.addEventListener("click", requestLocation);
 elements.demoArrivalBtn.addEventListener("click", () => openArScreen(state.activePoi));
 elements.openStampBookBtn.addEventListener("click", () => {
