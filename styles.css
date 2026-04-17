@@ -45,6 +45,7 @@ input {
 
 .intro-screen {
   align-items: start;
+  min-height: auto;
 }
 
 .screen-card {
@@ -931,11 +932,15 @@ model-viewer {
   .app-shell {
     width: min(100% - 12px, 1180px);
     padding-top: 0;
-    padding-bottom: 18px;
+    padding-bottom: 0;
   }
 
   .screen {
     min-height: calc(100vh - 20px);
+  }
+
+  .intro-screen {
+    min-height: auto;
   }
 
   .hero-card,
