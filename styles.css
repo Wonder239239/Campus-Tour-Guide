@@ -78,6 +78,7 @@ input {
   border-radius: 50%;
   background: linear-gradient(180deg, rgba(216, 203, 255, 0.18), rgba(141, 107, 255, 0.16));
   filter: blur(6px);
+  pointer-events: none;
 }
 
 .brand-plate {
