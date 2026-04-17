@@ -67,7 +67,7 @@ const texts = {
     scanSignBtn: "扫描标示牌",
     openStampBookFromArBtn: "集章页面",
     ocrStatus: "点击开始扫描。",
-    scanOverlayText: "Scanning the Building Signboard to collect stamps",
+    scanOverlayText: "扫描建筑标识牌以收集印章",
     scanDebugPrefix: "OCR 识别结果：",
     closeScanBtn: "关闭扫描",
     ocrProcessing: "正在识别标示牌文字，请稍候。",
