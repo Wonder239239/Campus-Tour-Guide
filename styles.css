@@ -1460,12 +1460,33 @@ input {
   display: grid;
   align-content: center;
   gap: 22px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hub-card::before {
+  content: "";
+  position: absolute;
+  inset: 14px;
+  border-radius: 28px;
+  border: 3px dashed rgba(255, 222, 89, 0.48);
+  pointer-events: none;
+}
+
+.hub-card h2 {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  text-align: center;
+  font-size: clamp(2rem, 4vw, 3rem);
 }
 
 .hub-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
+  position: relative;
+  z-index: 1;
 }
 
 .hub-chip {
@@ -1473,6 +1494,36 @@ input {
   width: 100%;
   justify-content: center;
   font-size: 1.08rem;
+  font-weight: 800;
+  color: #3a206d;
+  background: linear-gradient(180deg, #ffe98e 0%, #ffc94f 100%);
+  border: 3px solid #fff1b4;
+  box-shadow:
+    0 14px 0 rgba(129, 77, 0, 0.24),
+    0 22px 38px rgba(38, 12, 87, 0.2);
+  transform: translateY(0);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+
+.hub-chip:hover,
+.hub-chip:focus-visible {
+  transform: translateY(-4px) scale(1.01);
+  filter: brightness(1.03);
+  box-shadow:
+    0 18px 0 rgba(129, 77, 0, 0.2),
+    0 28px 44px rgba(38, 12, 87, 0.26);
+}
+
+.hub-chip:active {
+  transform: translateY(4px);
+  box-shadow:
+    0 8px 0 rgba(129, 77, 0, 0.22),
+    0 14px 24px rgba(38, 12, 87, 0.18);
+}
+
+.hub-card .page-back-row {
+  position: relative;
+  z-index: 1;
 }
 
 @media (max-width: 768px) {
@@ -1489,5 +1540,10 @@ input {
   .hub-chip {
     min-height: 84px;
     font-size: 1rem;
+  }
+
+  .hub-card::before {
+    inset: 10px;
+    border-radius: 22px;
   }
 }
