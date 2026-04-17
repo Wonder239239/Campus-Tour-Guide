@@ -64,7 +64,7 @@ input {
 }
 
 .hero-card {
-  min-height: 72vh;
+  min-height: auto;
   display: grid;
   align-content: start;
   gap: 18px;
@@ -442,9 +442,9 @@ select:focus {
 }
 
 .intro-actions {
-  margin-top: auto;
+  margin-top: 0;
   justify-content: center;
-  padding-top: 10px;
+  padding-top: 0;
 }
 
 .intro-cta-btn {
