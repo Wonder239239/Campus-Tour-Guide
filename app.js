@@ -365,6 +365,7 @@ const elements = {
   messageForm: document.getElementById("messageForm"),
   messageInput: document.getElementById("messageInput"),
   messageStatus: document.getElementById("messageStatus"),
+  messageWallShell: document.getElementById("messageWallShell"),
   submitMessageBtn: document.getElementById("submitMessageBtn"),
   backFromMessageBtn: document.getElementById("backFromMessageBtn"),
   messageMarqueeTrack: document.getElementById("messageMarqueeTrack"),
@@ -555,6 +556,7 @@ function renderMessageBoard(rows) {
   if (!rows.length) {
     elements.messageMarqueeTrack.innerHTML = `<p class="message-empty">${t.messageBoardEmpty}</p>`;
     elements.messageMarqueeTrack.classList.remove("is-scrolling");
+    elements.messageMarqueeTrack.style.removeProperty("--message-scroll-distance");
     return;
   }
 
@@ -572,8 +574,16 @@ function renderMessageBoard(rows) {
     )
     .join("");
 
-  elements.messageMarqueeTrack.innerHTML = `<div class="message-marquee-column">${cardMarkup}</div><div class="message-marquee-column" aria-hidden="true">${cardMarkup}</div>`;
-  elements.messageMarqueeTrack.classList.toggle("is-scrolling", rows.length > 2);
+  elements.messageMarqueeTrack.innerHTML = `<div class="message-marquee-column">${cardMarkup}</div>`;
+
+  requestAnimationFrame(() => {
+    const shellHeight = elements.messageWallShell?.clientHeight || 0;
+    const trackHeight = elements.messageMarqueeTrack?.scrollHeight || 0;
+    const distance = Math.max(0, trackHeight - shellHeight + 32);
+
+    elements.messageMarqueeTrack.style.setProperty("--message-scroll-distance", `${distance}px`);
+    elements.messageMarqueeTrack.classList.toggle("is-scrolling", distance > 24);
+  });
 }
 
 async function openMessageScreen() {

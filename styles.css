@@ -252,10 +252,11 @@ input {
   display: flex;
   flex-direction: column;
   gap: 18px;
+  --message-scroll-distance: 0px;
 }
 
 .message-marquee-track.is-scrolling {
-  animation: messageMarquee 20s linear infinite;
+  animation: messageMarquee 18s ease-in-out infinite alternate;
 }
 
 .message-marquee-column {
@@ -1007,7 +1008,7 @@ model-viewer {
     transform: translateY(0);
   }
   to {
-    transform: translateY(calc(-50% - 8px));
+    transform: translateY(calc(-1 * var(--message-scroll-distance)));
   }
 }
 
