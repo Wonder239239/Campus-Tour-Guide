@@ -1315,3 +1315,38 @@ applyTranslations = function (...args) {
 };
 
 window.addEventListener("load", mountMapBackButton);
+function syncMapActionButton() {
+  const mapScreen = document.getElementById("mapScreen");
+  if (!mapScreen || !elements.hubScreen) {
+    return;
+  }
+
+  const actionRow = mapScreen.querySelector(".button-row");
+  if (!actionRow) {
+    return;
+  }
+
+  const ghostButton = actionRow.querySelector(".ghost-btn");
+  if (!ghostButton) {
+    return;
+  }
+
+  const nextButton = ghostButton.cloneNode(true);
+  nextButton.id = "backToHubBtn";
+  nextButton.textContent = state.language === "zh" ? "返回" : "Back";
+  ghostButton.replaceWith(nextButton);
+
+  nextButton.addEventListener("click", () => {
+    showScreen(elements.hubScreen);
+  });
+}
+
+window.addEventListener("load", syncMapActionButton);
+setTimeout(syncMapActionButton, 0);
+
+const originalApplyTranslationsRef = applyTranslations;
+applyTranslations = function (...args) {
+  const result = originalApplyTranslationsRef.apply(this, args);
+  syncMapActionButton();
+  return result;
+};
