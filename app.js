@@ -44,7 +44,6 @@ const texts = {
   hubStampBtn: "🏅 Stamp Collection",
   hubMessageBtn: "💬 留言",
   hubUserInfoBtn: "👤 User Information",
-    backFromHubBtn: "返回",
     mapKicker: "XJTLU SIP Campus",
     mapTitle: "校园地图与实时定位",
     library: "FB（Foundation Building）",
@@ -151,7 +150,6 @@ const texts = {
   hubStampBtn: "🏅 Stamp Collection",
   hubMessageBtn: "💬 Message",
   hubUserInfoBtn: "👤 User Information",
-    backFromHubBtn: "Back",
     mapKicker: "XJTLU SIP Campus",
     mapTitle: "Campus Map And Live Positioning",
     library: "FB (Foundation Building)",
@@ -334,7 +332,6 @@ const elements = {
   hubStampBtn: document.getElementById("hubStampBtn"),
   hubMessageBtn: document.getElementById("hubMessageBtn"),
   hubUserInfoBtn: document.getElementById("hubUserInfoBtn"),
-  backFromHubBtn: document.getElementById("backFromHubBtn"),
   startLocationBtn: document.getElementById("startLocationBtn"),
   demoArrivalBtn: document.getElementById("demoArrivalBtn"),
   openStampBookBtn: document.getElementById("openStampBookBtn"),
@@ -407,7 +404,6 @@ const translatableIds = [
   "hubStampBtn",
   "hubMessageBtn",
   "hubUserInfoBtn",
-  "backFromHubBtn",
   "mapKicker",
   "mapTitle",
   "mapStatusLine",
@@ -1324,3 +1320,8 @@ applyTranslations = function (...args) {
 
 window.addEventListener("load", syncMapStampButtonToBack);
 setTimeout(syncMapStampButtonToBack, 0);
+if (elements.backFromHubBtn) {
+  elements.backFromHubBtn.addEventListener("click", () => {
+    showScreen(elements.roleScreen);
+  });
+}
