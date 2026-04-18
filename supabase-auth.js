@@ -179,5 +179,40 @@ if (!hasUsableSupabaseConfig(config)) {
         }))
         .sort((a, b) => b.count - a.count || a.username.localeCompare(b.username));
     };
+
+    window.authSaveMessage = async ({ uid, username, content }) => {
+      const { error } = await supabase.from("messages").insert({
+        uid,
+        username,
+        content
+      });
+
+      if (error) {
+        throw error;
+      }
+    };
+
+    window.authGetMessages = async () => {
+      const { data, error } = await supabase
+        .from("messages")
+        .select("username, content, created_at")
+        .order("created_at", { ascending: false })
+        .limit(30);
+
+      if (error) {
+        throw error;
+      }
+
+      return (data || []).map((entry) => ({
+        username: entry.username,
+        content: entry.content,
+        createdAt: new Date(entry.created_at).toLocaleString("zh-CN", {
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit"
+        })
+      }));
+    };
   }
 }

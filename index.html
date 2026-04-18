@@ -264,6 +264,35 @@
         </div>
       </section>
 
+      <section class="screen hidden" id="messageScreen">
+        <div class="screen-card choice-card message-card">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker" id="messageKicker">Message Board</p>
+              <h2 id="messageTitle">Visitor Messages</h2>
+            </div>
+          </div>
+
+          <form class="message-form" id="messageForm">
+            <label class="select-field">
+              <span id="messageInputLabel">Leave a message</span>
+              <textarea id="messageInput" rows="4" maxlength="160" placeholder="Share your campus visit thoughts..."></textarea>
+            </label>
+          </form>
+
+          <p class="status-text" id="messageStatus">Write a short message and submit it to the board.</p>
+
+          <div class="button-row message-actions">
+            <button class="primary-btn" id="submitMessageBtn" type="button">Post Message</button>
+            <button class="ghost-btn" id="backFromMessageBtn" type="button">Back</button>
+          </div>
+
+          <div class="message-marquee-shell">
+            <div class="message-marquee-track" id="messageMarqueeTrack"></div>
+          </div>
+        </div>
+      </section>
+
       <section class="screen hidden" id="leaderboardScreen">
         <div class="screen-card choice-card stamp-card">
           <div class="section-heading">

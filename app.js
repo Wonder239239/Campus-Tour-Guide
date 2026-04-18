@@ -40,10 +40,24 @@ const texts = {
     backToIntroBtn: "返回注册页",
     goMapBtn: "进入功能页面",
   hubTitle: "功能入口 ✨",
-  hubCampusMapBtn: "🗺️ Campus Map",
-  hubStampBtn: "🏅 Stamp Collection",
-  hubMessageBtn: "💬 留言",
-  hubUserInfoBtn: "👤 User Information",
+    hubCampusMapBtn: "🗺️ Campus Map",
+    hubStampBtn: "🏅 Stamp Collection",
+    hubMessageBtn: "💬 留言",
+    hubUserInfoBtn: "👤 User Information",
+    messageKicker: "留言板",
+    messageTitle: "参观留言",
+    messageInputLabel: "留下你的参观留言",
+    messagePlaceholder: "写下你对校园参观的感受吧...",
+    messageStatus: "输入留言后提交，系统会滚动展示所有留言。",
+    submitMessageBtn: "发布留言",
+    backFromMessageBtn: "返回",
+    messageLoading: "正在加载留言。",
+    messageSubmitting: "正在发布留言。",
+    messageEmpty: "请输入留言内容。",
+    messageSuccess: "留言发布成功。",
+    messageLoadFailed: (message) => `留言加载失败：${message}`,
+    messageSubmitFailed: (message) => `留言发布失败：${message}`,
+    messageBoardEmpty: "还没有留言，来留下第一条吧。",
     mapKicker: "XJTLU SIP Campus",
     mapTitle: "校园地图与实时定位",
     library: "FB（Foundation Building）",
@@ -146,10 +160,24 @@ const texts = {
     backToIntroBtn: "Back To Registration",
     goMapBtn: "Enter Service Hub",
   hubTitle: "Service Hub ✨",
-  hubCampusMapBtn: "🗺️ Campus Map",
-  hubStampBtn: "🏅 Stamp Collection",
-  hubMessageBtn: "💬 Message",
-  hubUserInfoBtn: "👤 User Information",
+    hubCampusMapBtn: "🗺️ Campus Map",
+    hubStampBtn: "🏅 Stamp Collection",
+    hubMessageBtn: "💬 Message",
+    hubUserInfoBtn: "👤 User Information",
+    messageKicker: "Message Board",
+    messageTitle: "Visitor Messages",
+    messageInputLabel: "Leave a message",
+    messagePlaceholder: "Share your campus visit thoughts...",
+    messageStatus: "Write a short message and submit it to the board.",
+    submitMessageBtn: "Post Message",
+    backFromMessageBtn: "Back",
+    messageLoading: "Loading messages.",
+    messageSubmitting: "Posting message.",
+    messageEmpty: "Please enter a message.",
+    messageSuccess: "Message posted successfully.",
+    messageLoadFailed: (message) => `Failed to load messages: ${message}`,
+    messageSubmitFailed: (message) => `Failed to post message: ${message}`,
+    messageBoardEmpty: "No messages yet. Be the first to post one.",
     mapKicker: "XJTLU SIP Campus",
     mapTitle: "Campus Map And Live Positioning",
     library: "FB (Foundation Building)",
@@ -281,6 +309,7 @@ const state = {
   activePoi: pois[0],
   currentStream: null,
   registeredUser: null,
+  username: "",
   collectedStamps: [],
   previousScreen: "map"
 };
@@ -308,6 +337,7 @@ const elements = {
   arrivalScreen: document.getElementById("arrivalScreen"),
   arScreen: document.getElementById("arScreen"),
   stampScreen: document.getElementById("stampScreen"),
+  messageScreen: document.getElementById("messageScreen"),
   leaderboardScreen: document.getElementById("leaderboardScreen"),
   languageSelect: document.getElementById("languageSelect"),
   goRoleBtn: document.getElementById("goRoleBtn"),
@@ -332,6 +362,12 @@ const elements = {
   hubStampBtn: document.getElementById("hubStampBtn"),
   hubMessageBtn: document.getElementById("hubMessageBtn"),
   hubUserInfoBtn: document.getElementById("hubUserInfoBtn"),
+  messageForm: document.getElementById("messageForm"),
+  messageInput: document.getElementById("messageInput"),
+  messageStatus: document.getElementById("messageStatus"),
+  submitMessageBtn: document.getElementById("submitMessageBtn"),
+  backFromMessageBtn: document.getElementById("backFromMessageBtn"),
+  messageMarqueeTrack: document.getElementById("messageMarqueeTrack"),
   startLocationBtn: document.getElementById("startLocationBtn"),
   demoArrivalBtn: document.getElementById("demoArrivalBtn"),
   openStampBookBtn: document.getElementById("openStampBookBtn"),
@@ -404,6 +440,12 @@ const translatableIds = [
   "hubStampBtn",
   "hubMessageBtn",
   "hubUserInfoBtn",
+  "messageKicker",
+  "messageTitle",
+  "messageInputLabel",
+  "submitMessageBtn",
+  "backFromMessageBtn",
+  "messageStatus",
   "mapKicker",
   "mapTitle",
   "mapStatusLine",
@@ -440,7 +482,7 @@ const translatableIds = [
 ];
 
 function showScreen(screen) {
-  [elements.introScreen, elements.registerScreen, elements.roleScreen, elements.hubScreen, elements.mapScreen, elements.arrivalScreen, elements.arScreen, elements.stampScreen, elements.leaderboardScreen].forEach((node) => {
+  [elements.introScreen, elements.registerScreen, elements.roleScreen, elements.hubScreen, elements.mapScreen, elements.arrivalScreen, elements.arScreen, elements.stampScreen, elements.messageScreen, elements.leaderboardScreen].forEach((node) => {
     node.classList.add("hidden");
     node.classList.remove("screen-active");
   });
@@ -505,6 +547,53 @@ function renderLeaderboardRows(rows) {
         `
       )
       .join("");
+}
+
+function renderMessageBoard(rows) {
+  const t = getCopy();
+
+  if (!rows.length) {
+    elements.messageMarqueeTrack.innerHTML = `<p class="message-empty">${t.messageBoardEmpty}</p>`;
+    elements.messageMarqueeTrack.classList.remove("is-scrolling");
+    return;
+  }
+
+  const cardMarkup = rows
+    .map(
+      (entry) => `
+        <article class="message-entry">
+          <header class="message-entry-head">
+            <span class="message-user">${entry.username}</span>
+            <span class="message-time">${entry.createdAt}</span>
+          </header>
+          <p class="message-body">${entry.content}</p>
+        </article>
+      `
+    )
+    .join("");
+
+  elements.messageMarqueeTrack.innerHTML = `<div class="message-marquee-column">${cardMarkup}</div><div class="message-marquee-column" aria-hidden="true">${cardMarkup}</div>`;
+  elements.messageMarqueeTrack.classList.toggle("is-scrolling", rows.length > 2);
+}
+
+async function openMessageScreen() {
+  const t = getCopy();
+  showScreen(elements.messageScreen);
+  elements.messageStatus.textContent = t.messageLoading;
+  renderMessageBoard([]);
+
+  if (typeof window.authGetMessages !== "function") {
+    elements.messageStatus.textContent = t.messageLoadFailed("Message API is unavailable.");
+    return;
+  }
+
+  try {
+    const rows = await window.authGetMessages();
+    renderMessageBoard(rows);
+    elements.messageStatus.textContent = t.messageStatus;
+  } catch (error) {
+    elements.messageStatus.textContent = t.messageLoadFailed(getAuthErrorMessage(error));
+  }
 }
 
 async function openLeaderboardScreen() {
@@ -600,6 +689,9 @@ function applyTranslations() {
 
   elements.studentChip.textContent = t.student;
   elements.visitorChip.textContent = t.visitor;
+  if (elements.messageInput) {
+    elements.messageInput.placeholder = t.messagePlaceholder;
+  }
   syncAuthModeUi();
   elements.selectionHint.textContent = state.role ? t.roleReady(state.role) : t.selectionHint;
   elements.ocrStatus.textContent = t.ocrStatus;
@@ -695,6 +787,7 @@ async function submitRegistration() {
       ? await window.authRegister({ name, password })
       : await window.authLogin({ name, password });
     state.registeredUser = user;
+    state.username = name;
     const profile = typeof window.authGetProfile === "function" ? await window.authGetProfile(user.id) : null;
     state.collectedStamps = normalizeCollectedStamps(Array.isArray(profile?.stamps) ? profile.stamps : []);
 
@@ -720,6 +813,40 @@ async function submitRegistration() {
     elements.registerStatus.textContent = t.registerFailed(getAuthErrorMessage(error));
   } finally {
     elements.registerSubmitBtn.disabled = false;
+  }
+}
+
+async function submitMessage() {
+  const t = getCopy();
+  const content = elements.messageInput.value.trim();
+
+  if (!content) {
+    elements.messageStatus.textContent = t.messageEmpty;
+    return;
+  }
+
+  if (!state.registeredUser?.id || typeof window.authSaveMessage !== "function") {
+    elements.messageStatus.textContent = t.messageSubmitFailed("Message API is unavailable.");
+    return;
+  }
+
+  elements.submitMessageBtn.disabled = true;
+  elements.messageStatus.textContent = t.messageSubmitting;
+
+  try {
+    await window.authSaveMessage({
+      uid: state.registeredUser.id,
+      username: state.username || state.registeredUser.user_metadata?.username || "User",
+      content
+    });
+    elements.messageInput.value = "";
+    elements.messageStatus.textContent = t.messageSuccess;
+    const rows = await window.authGetMessages();
+    renderMessageBoard(rows);
+  } catch (error) {
+    elements.messageStatus.textContent = t.messageSubmitFailed(getAuthErrorMessage(error));
+  } finally {
+    elements.submitMessageBtn.disabled = false;
   }
 }
 
@@ -1239,8 +1366,16 @@ elements.hubStampBtn.addEventListener("click", () => {
   renderStampBook();
   showScreen(elements.stampScreen);
 });
-elements.hubMessageBtn.addEventListener("click", () => {});
+elements.hubMessageBtn.addEventListener("click", openMessageScreen);
 elements.hubUserInfoBtn.addEventListener("click", () => {});
+elements.submitMessageBtn.addEventListener("click", submitMessage);
+elements.messageForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  submitMessage();
+});
+elements.backFromMessageBtn.addEventListener("click", () => {
+  showScreen(elements.hubScreen);
+});
 elements.demoArrivalBtn.addEventListener("click", () => openArScreen(state.activePoi));
 elements.openStampBookBtn.addEventListener("click", () => {
   showScreen(elements.hubScreen);
