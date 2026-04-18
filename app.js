@@ -1288,12 +1288,20 @@ elements.backToMapBtn.addEventListener("click", () => {
 });
 
 applyTranslations();
-function mountMapBackButton() {
-  const sourceButton =
-    document.getElementById("backToHubBtn") ||
-    document.getElementById("mapStampBtn");
+function syncMapStampButtonToBack() {
+  const mapScreen = document.getElementById("mapScreen");
+  if (!mapScreen || !elements.hubScreen) {
+    return;
+  }
 
-  if (!sourceButton || !elements.hubScreen) {
+  const sourceButton =
+    mapScreen.querySelector("#mapStampBtn") ||
+    Array.from(mapScreen.querySelectorAll(".ghost-btn")).find((button) => {
+      const label = (button.textContent || "").trim().toLowerCase();
+      return label.includes("stamp") || label.includes("集章");
+    });
+
+  if (!sourceButton) {
     return;
   }
 
@@ -1307,46 +1315,12 @@ function mountMapBackButton() {
   });
 }
 
-const originalApplyTranslations = applyTranslations;
-applyTranslations = function (...args) {
-  const result = originalApplyTranslations.apply(this, args);
-  mountMapBackButton();
-  return result;
-};
-
-window.addEventListener("load", mountMapBackButton);
-function syncMapActionButton() {
-  const mapScreen = document.getElementById("mapScreen");
-  if (!mapScreen || !elements.hubScreen) {
-    return;
-  }
-
-  const actionRow = mapScreen.querySelector(".button-row");
-  if (!actionRow) {
-    return;
-  }
-
-  const ghostButton = actionRow.querySelector(".ghost-btn");
-  if (!ghostButton) {
-    return;
-  }
-
-  const nextButton = ghostButton.cloneNode(true);
-  nextButton.id = "backToHubBtn";
-  nextButton.textContent = state.language === "zh" ? "返回" : "Back";
-  ghostButton.replaceWith(nextButton);
-
-  nextButton.addEventListener("click", () => {
-    showScreen(elements.hubScreen);
-  });
-}
-
-window.addEventListener("load", syncMapActionButton);
-setTimeout(syncMapActionButton, 0);
-
 const originalApplyTranslationsRef = applyTranslations;
 applyTranslations = function (...args) {
   const result = originalApplyTranslationsRef.apply(this, args);
-  syncMapActionButton();
+  syncMapStampButtonToBack();
   return result;
 };
+
+window.addEventListener("load", syncMapStampButtonToBack);
+setTimeout(syncMapStampButtonToBack, 0);
