@@ -52,7 +52,7 @@ const texts = {
     mapStatusLine: "",
     startLocationBtn: "启动实时定位",
     demoArrivalBtn: "演示模式：直接进入 AR",
-    openStampBookBtn: "集章页面",
+    openStampBookBtn: "返回",
     arrivalKicker: "定位完成",
     arrivalTitle: "已到达目标地点",
     arrivalMessage: "即将进入讲解页面。",
@@ -158,7 +158,7 @@ const texts = {
     mapStatusLine: "",
     startLocationBtn: "Start Live Positioning",
     demoArrivalBtn: "Demo Mode: Enter AR Directly",
-    openStampBookBtn: "Stamp Collection",
+    openStampBookBtn: "Back",
     arrivalKicker: "Location Confirmed",
     arrivalTitle: "Arrival Confirmed",
     arrivalMessage: "The narration will begin shortly.",
@@ -1241,12 +1241,9 @@ elements.hubStampBtn.addEventListener("click", () => {
 });
 elements.hubMessageBtn.addEventListener("click", () => {});
 elements.hubUserInfoBtn.addEventListener("click", () => {});
-elements.backFromHubBtn.addEventListener("click", () => showScreen(elements.roleScreen));
 elements.demoArrivalBtn.addEventListener("click", () => openArScreen(state.activePoi));
 elements.openStampBookBtn.addEventListener("click", () => {
-  state.previousScreen = "map";
-  renderStampBook();
-  showScreen(elements.stampScreen);
+  showScreen(elements.hubScreen);
 });
 elements.openLeaderboardBtn.addEventListener("click", openLeaderboardScreen);
 elements.scanSignBtn.addEventListener("click", openScanOverlay);
@@ -1284,44 +1281,3 @@ elements.backToMapBtn.addEventListener("click", () => {
 });
 
 applyTranslations();
-function syncMapStampButtonToBack() {
-  const mapScreen = document.getElementById("mapScreen");
-  if (!mapScreen || !elements.hubScreen) {
-    return;
-  }
-
-  const sourceButton =
-    mapScreen.querySelector("#mapStampBtn") ||
-    Array.from(mapScreen.querySelectorAll(".ghost-btn")).find((button) => {
-      const label = (button.textContent || "").trim().toLowerCase();
-      return label.includes("stamp") || label.includes("集章");
-    });
-
-  if (!sourceButton) {
-    return;
-  }
-
-  const nextButton = sourceButton.cloneNode(true);
-  nextButton.id = "backToHubBtn";
-  nextButton.textContent = state.language === "zh" ? "返回" : "Back";
-  sourceButton.replaceWith(nextButton);
-
-  nextButton.addEventListener("click", () => {
-    showScreen(elements.hubScreen);
-  });
-}
-
-const originalApplyTranslationsRef = applyTranslations;
-applyTranslations = function (...args) {
-  const result = originalApplyTranslationsRef.apply(this, args);
-  syncMapStampButtonToBack();
-  return result;
-};
-
-window.addEventListener("load", syncMapStampButtonToBack);
-setTimeout(syncMapStampButtonToBack, 0);
-if (elements.backFromHubBtn) {
-  elements.backFromHubBtn.addEventListener("click", () => {
-    showScreen(elements.roleScreen);
-  });
-}
