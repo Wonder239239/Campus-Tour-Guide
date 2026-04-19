@@ -278,25 +278,36 @@ input {
 
 .message-marquee-track {
   position: relative;
-  display: flex;
-  align-items: center;
-  width: max-content;
+  display: grid;
+  align-content: center;
+  gap: 14px;
   min-height: 100%;
-  gap: 18px;
-  --message-scroll-distance: 0px;
+}
+
+.message-lane {
+  overflow: visible;
+}
+
+.message-lane-track {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  width: max-content;
   --message-track-width: 0px;
   --message-shell-width: 0px;
 }
 
-.message-marquee-track.is-scrolling {
-  animation: messageMarquee 18s linear infinite;
+.message-marquee-track.is-scrolling .lane-1 .message-lane-track {
+  animation: messageMarqueeLane1 20s linear infinite;
 }
 
-.message-marquee-column {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 16px;
+.message-marquee-track.is-scrolling .lane-2 .message-lane-track {
+  animation: messageMarqueeLane2 24s linear infinite;
+}
+
+.message-marquee-track.is-scrolling .lane-3 .message-lane-track {
+  animation: messageMarqueeLane3 18s linear infinite;
 }
 
 .message-entry {
@@ -308,6 +319,21 @@ input {
   width: max-content;
   max-width: min(80vw, 420px);
   flex: 0 0 auto;
+}
+
+.message-size-1 {
+  transform: translateY(-4px);
+  max-width: min(72vw, 320px);
+}
+
+.message-size-2 {
+  transform: translateY(6px);
+  max-width: min(80vw, 400px);
+}
+
+.message-size-3 {
+  transform: translateY(-2px);
+  max-width: min(76vw, 360px);
 }
 
 .message-entry-head {
@@ -1035,6 +1061,33 @@ model-viewer {
   }
 }
 
+@keyframes messageMarqueeLane1 {
+  from {
+    transform: translateX(calc(-1 * var(--message-track-width)));
+  }
+  to {
+    transform: translateX(var(--message-shell-width));
+  }
+}
+
+@keyframes messageMarqueeLane2 {
+  from {
+    transform: translateX(calc(-1 * var(--message-track-width) - 120px));
+  }
+  to {
+    transform: translateX(calc(var(--message-shell-width) + 60px));
+  }
+}
+
+@keyframes messageMarqueeLane3 {
+  from {
+    transform: translateX(calc(-1 * var(--message-track-width) - 48px));
+  }
+  to {
+    transform: translateX(calc(var(--message-shell-width) + 120px));
+  }
+}
+
 @keyframes avatarSway {
   0%,
   100% {
@@ -1715,6 +1768,20 @@ input {
   .message-entry {
     max-width: 78vw;
     border-radius: 22px;
+  }
+
+  .message-marquee-track {
+    gap: 10px;
+  }
+
+  .message-lane-track {
+    gap: 10px;
+  }
+
+  .message-size-1,
+  .message-size-2,
+  .message-size-3 {
+    max-width: 72vw;
   }
 
   .user-info-grid {

@@ -601,35 +601,56 @@ function renderMessageBoard(rows) {
   if (!rows.length) {
     elements.messageMarqueeTrack.innerHTML = `<p class="message-empty">${t.messageBoardEmpty}</p>`;
     elements.messageMarqueeTrack.classList.remove("is-scrolling");
-    elements.messageMarqueeTrack.style.removeProperty("--message-scroll-distance");
-    elements.messageMarqueeTrack.style.removeProperty("--message-track-width");
-    elements.messageMarqueeTrack.style.removeProperty("--message-shell-width");
     return;
   }
 
-  const cardMarkup = rows
-    .map(
-      (entry) => `
-        <article class="message-entry">
-          <header class="message-entry-head">
-            <span class="message-user">${entry.username}</span>
-            <span class="message-time">${entry.createdAt}</span>
-          </header>
-          <p class="message-body">${entry.content}</p>
-        </article>
-      `
-    )
+  const lanes = [[], [], []];
+  rows.forEach((entry, index) => {
+    lanes[index % 3].push(entry);
+  });
+
+  const laneMarkup = lanes
+    .map((lane, laneIndex) => {
+      const laneEntries = lane.length ? lane : rows.filter((_, index) => index % 3 === 0);
+      const cards = laneEntries
+        .map(
+          (entry, entryIndex) => `
+            <article class="message-entry message-size-${(entryIndex % 3) + 1}">
+              <header class="message-entry-head">
+                <span class="message-user">${entry.username}</span>
+                <span class="message-time">${entry.createdAt}</span>
+              </header>
+              <p class="message-body">${entry.content}</p>
+            </article>
+          `
+        )
+        .join("");
+
+      return `
+        <div class="message-lane lane-${laneIndex + 1}">
+          <div class="message-lane-track">${cards}</div>
+        </div>
+      `;
+    })
     .join("");
 
-  elements.messageMarqueeTrack.innerHTML = `<div class="message-marquee-column">${cardMarkup}</div>`;
+  elements.messageMarqueeTrack.innerHTML = laneMarkup;
 
   requestAnimationFrame(() => {
     const shellWidth = elements.messageWallShell?.clientWidth || 0;
-    const trackWidth = elements.messageMarqueeTrack?.scrollWidth || 0;
+    const laneTracks = elements.messageMarqueeTrack.querySelectorAll(".message-lane-track");
+    let hasMotion = false;
 
-    elements.messageMarqueeTrack.style.setProperty("--message-shell-width", `${shellWidth}px`);
-    elements.messageMarqueeTrack.style.setProperty("--message-track-width", `${trackWidth}px`);
-    elements.messageMarqueeTrack.classList.toggle("is-scrolling", trackWidth > 0 && shellWidth > 0);
+    laneTracks.forEach((track) => {
+      const trackWidth = track.scrollWidth || 0;
+      track.style.setProperty("--message-shell-width", `${shellWidth}px`);
+      track.style.setProperty("--message-track-width", `${trackWidth}px`);
+      if (trackWidth > 0 && shellWidth > 0) {
+        hasMotion = true;
+      }
+    });
+
+    elements.messageMarqueeTrack.classList.toggle("is-scrolling", hasMotion);
   });
 }
 
