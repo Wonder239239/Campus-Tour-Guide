@@ -312,36 +312,52 @@ input {
 
 .message-entry {
   border-radius: 999px;
-  padding: 12px 18px;
+  padding: 9px 14px;
   border: 1px solid rgba(255, 255, 255, 0.16);
   background: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 12px 28px rgba(18, 8, 52, 0.16);
+  box-shadow: 0 8px 20px rgba(18, 8, 52, 0.14);
   width: max-content;
-  max-width: min(80vw, 420px);
+  max-width: min(62vw, 280px);
   flex: 0 0 auto;
 }
 
 .message-size-1 {
   transform: translateY(-4px);
-  max-width: min(72vw, 320px);
+  max-width: min(56vw, 220px);
 }
 
 .message-size-2 {
   transform: translateY(6px);
-  max-width: min(80vw, 400px);
+  max-width: min(62vw, 260px);
 }
 
 .message-size-3 {
   transform: translateY(-2px);
-  max-width: min(76vw, 360px);
+  max-width: min(60vw, 240px);
+}
+
+.message-lane .message-entry:nth-child(4n + 1) {
+  background: rgba(255, 230, 161, 0.22);
+}
+
+.message-lane .message-entry:nth-child(4n + 2) {
+  background: rgba(172, 233, 255, 0.18);
+}
+
+.message-lane .message-entry:nth-child(4n + 3) {
+  background: rgba(255, 196, 220, 0.18);
+}
+
+.message-lane .message-entry:nth-child(4n + 4) {
+  background: rgba(202, 255, 199, 0.16);
 }
 
 .message-entry-head {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 4px;
-  font-size: 0.88rem;
+  margin-bottom: 3px;
+  font-size: 0.76rem;
 }
 
 .message-user {
@@ -350,13 +366,14 @@ input {
 
 .message-time {
   color: var(--muted);
-  font-size: 0.82rem;
+  font-size: 0.7rem;
 }
 
 .message-body,
 .message-empty {
   color: var(--text);
-  line-height: 1.45;
+  line-height: 1.35;
+  font-size: 0.82rem;
 }
 
 .message-empty {
@@ -1766,8 +1783,9 @@ input {
   }
 
   .message-entry {
-    max-width: 78vw;
-    border-radius: 22px;
+    max-width: 56vw;
+    border-radius: 18px;
+    padding: 8px 12px;
   }
 
   .message-marquee-track {
@@ -1781,7 +1799,7 @@ input {
   .message-size-1,
   .message-size-2,
   .message-size-3 {
-    max-width: 72vw;
+    max-width: 54vw;
   }
 
   .user-info-grid {
