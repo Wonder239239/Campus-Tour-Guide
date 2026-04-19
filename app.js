@@ -334,6 +334,7 @@ const state = {
   authMode: "register",
   activePoi: pois[0],
   currentStream: null,
+  shouldResumeArCamera: false,
   registeredUser: null,
   username: "",
   collectedStamps: [],
@@ -416,8 +417,10 @@ const elements = {
   distanceValueCb: document.getElementById("distanceValueCb"),
   distanceValueSd: document.getElementById("distanceValueSd"),
   backToMapBtn: document.getElementById("backToMapBtn"),
+  guideStage: document.querySelector(".guide-stage"),
   avatarCard: document.getElementById("avatarCard"),
   avatarViewer: document.getElementById("avatarViewer"),
+  arCameraVideo: document.getElementById("arCameraVideo"),
   scanSignBtn: document.getElementById("scanSignBtn"),
   openStampBookFromArBtn: document.getElementById("openStampBookFromArBtn"),
   ocrStatus: document.getElementById("ocrStatus"),
@@ -1059,10 +1062,50 @@ function speakNarration() {
   window.speechSynthesis.speak(utterance);
 }
 
+async function startArCamera() {
+  if (!navigator.mediaDevices?.getUserMedia || !elements.arCameraVideo) {
+    return;
+  }
+
+  stopArCamera();
+
+  try {
+    state.currentStream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: { ideal: "environment" }
+      },
+      audio: false
+    });
+
+    elements.arCameraVideo.srcObject = state.currentStream;
+    elements.guideStage?.classList?.add?.("ar-camera-active");
+  } catch {
+    if (elements.guideStage) {
+      elements.guideStage.classList.remove("ar-camera-active");
+    }
+  }
+}
+
+function stopArCamera() {
+  if (state.currentStream) {
+    state.currentStream.getTracks().forEach((track) => track.stop());
+    state.currentStream = null;
+  }
+
+  if (elements.arCameraVideo) {
+    elements.arCameraVideo.srcObject = null;
+  }
+
+  if (elements.guideStage) {
+    elements.guideStage.classList.remove("ar-camera-active");
+  }
+}
+
 async function openArScreen(poi) {
   state.activePoi = poi;
   updateNarration();
   showScreen(elements.arScreen);
+  await startArCamera();
   enableMotionControl();
   speakNarration();
 }
@@ -1305,6 +1348,11 @@ async function openScanOverlay() {
   }
 
   try {
+    state.shouldResumeArCamera = elements.arScreen.classList.contains("screen-active");
+    if (state.shouldResumeArCamera) {
+      stopArCamera();
+    }
+
     scanStream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: { ideal: "environment" } },
       audio: false
@@ -1339,6 +1387,11 @@ function closeScanOverlay() {
   elements.scanVideo.srcObject = null;
   elements.scanDebugText.textContent = "";
   elements.scanOverlay.classList.add("hidden");
+
+  if (state.shouldResumeArCamera && elements.arScreen.classList.contains("screen-active")) {
+    state.shouldResumeArCamera = false;
+    startArCamera();
+  }
 }
 
 function handleArrival(poi) {
@@ -1481,6 +1534,7 @@ elements.openStampBookBtn.addEventListener("click", () => {
 elements.openLeaderboardBtn.addEventListener("click", openLeaderboardScreen);
 elements.scanSignBtn.addEventListener("click", openScanOverlay);
 elements.openStampBookFromArBtn.addEventListener("click", () => {
+  stopArCamera();
   state.previousScreen = "ar";
   renderStampBook();
   showScreen(elements.stampScreen);
@@ -1491,6 +1545,7 @@ elements.stopAudioBtn.addEventListener("click", () => window.speechSynthesis.can
 elements.backFromStampBtn.addEventListener("click", () => {
   if (state.previousScreen === "ar") {
     showScreen(elements.arScreen);
+    startArCamera();
     return;
   }
 
@@ -1509,6 +1564,7 @@ elements.backFromLeaderboardBtn.addEventListener("click", () => {
 elements.backToMapBtn.addEventListener("click", () => {
   window.speechSynthesis.cancel();
   closeScanOverlay();
+  stopArCamera();
   showScreen(elements.mapScreen);
   renderMap();
 });
