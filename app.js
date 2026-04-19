@@ -4,6 +4,9 @@ const texts = {
     heroTitle: "欢迎使用 X·EasyGo",
     languageLabel: "语言",
     goRoleBtn: "进入注册",
+    authChoiceTitle: "选择登录或注册",
+    authChoiceStatus: "请选择一种方式进入下一步。",
+    backToIntroFromChoiceBtn: "返回语言页",
     registerTitle: "创建账户",
     registerModeBtn: "注册",
     loginModeBtn: "登录",
@@ -19,7 +22,7 @@ const texts = {
     loginSubmitBtn: "登录并继续",
     loginEmpty: "请输入用户名和密码。",
     loginSuccess: "登录成功，现在进入身份选择页面。",
-    backToIntroFromRegisterBtn: "返回语言页",
+    backToIntroFromRegisterBtn: "返回",
     registerEmpty: "请完整填写用户名、密码和确认密码。",
     invalidUsername: "用户名需为 3-16 位，且只能包含字母和数字。",
     registerMismatch: "两次输入的密码不一致。",
@@ -134,6 +137,9 @@ const texts = {
     heroTitle: "Welcome to X·EasyGo",
     languageLabel: "Language",
     goRoleBtn: "Go To Registration",
+    authChoiceTitle: "Choose Login Or Register",
+    authChoiceStatus: "Choose one option to continue to the next step.",
+    backToIntroFromChoiceBtn: "Back To Language",
     registerTitle: "Create Your Account",
     registerModeBtn: "Register",
     loginModeBtn: "Login",
@@ -149,7 +155,7 @@ const texts = {
     loginSubmitBtn: "Login And Continue",
     loginEmpty: "Please enter your username and password.",
     loginSuccess: "Login succeeded. Continue to identity selection.",
-    backToIntroFromRegisterBtn: "Back To Language",
+    backToIntroFromRegisterBtn: "Back",
     registerEmpty: "Please complete username, password, and confirm password.",
     invalidUsername: "Username must be 3-16 characters and contain only letters and numbers.",
     registerMismatch: "The two passwords do not match.",
@@ -350,6 +356,7 @@ function normalizeCollectedStamps(stamps = []) {
 
 const elements = {
   introScreen: document.getElementById("introScreen"),
+  authChoiceScreen: document.getElementById("authChoiceScreen"),
   registerScreen: document.getElementById("registerScreen"),
   roleScreen: document.getElementById("roleScreen"),
   hubScreen: document.getElementById("hubScreen"),
@@ -362,6 +369,7 @@ const elements = {
   leaderboardScreen: document.getElementById("leaderboardScreen"),
   languageSelect: document.getElementById("languageSelect"),
   goRoleBtn: document.getElementById("goRoleBtn"),
+  backToIntroFromChoiceBtn: document.getElementById("backToIntroFromChoiceBtn"),
   registerForm: document.getElementById("registerForm"),
   registerModeBtn: document.getElementById("registerModeBtn"),
   loginModeBtn: document.getElementById("loginModeBtn"),
@@ -450,6 +458,9 @@ const translatableIds = [
   "heroTitle",
   "languageLabel",
   "goRoleBtn",
+  "authChoiceTitle",
+  "authChoiceStatus",
+  "backToIntroFromChoiceBtn",
   "registerTitle",
   "registerModeBtn",
   "loginModeBtn",
@@ -516,7 +527,7 @@ const translatableIds = [
 ];
 
 function showScreen(screen) {
-  [elements.introScreen, elements.registerScreen, elements.roleScreen, elements.hubScreen, elements.userInfoScreen, elements.mapScreen, elements.arrivalScreen, elements.arScreen, elements.stampScreen, elements.messageScreen, elements.leaderboardScreen].forEach((node) => {
+  [elements.introScreen, elements.authChoiceScreen, elements.registerScreen, elements.roleScreen, elements.hubScreen, elements.userInfoScreen, elements.mapScreen, elements.arrivalScreen, elements.arScreen, elements.stampScreen, elements.messageScreen, elements.leaderboardScreen].forEach((node) => {
     node.classList.add("hidden");
     node.classList.remove("screen-active");
   });
@@ -795,6 +806,7 @@ function syncAuthModeUi() {
 function setAuthMode(mode) {
   state.authMode = mode;
   syncAuthModeUi();
+  showScreen(elements.registerScreen);
 }
 
 function getAuthErrorMessage(error) {
@@ -1393,12 +1405,13 @@ elements.languageSelect.addEventListener("change", (event) => {
 });
 
 elements.goRoleBtn.addEventListener("click", () => {
-  showScreen(elements.registerScreen);
+  showScreen(elements.authChoiceScreen);
 });
 
 elements.registerModeBtn.addEventListener("click", () => setAuthMode("register"));
 elements.loginModeBtn.addEventListener("click", () => setAuthMode("login"));
-elements.backToIntroFromRegisterBtn.addEventListener("click", () => showScreen(elements.introScreen));
+elements.backToIntroFromChoiceBtn.addEventListener("click", () => showScreen(elements.introScreen));
+elements.backToIntroFromRegisterBtn.addEventListener("click", () => showScreen(elements.authChoiceScreen));
 elements.registerSubmitBtn.addEventListener("click", submitRegistration);
 elements.registerForm.addEventListener("submit", (event) => {
   event.preventDefault();

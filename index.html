@@ -51,17 +51,34 @@
         </div>
       </section>
 
+      <section class="screen hidden" id="authChoiceScreen">
+        <div class="screen-card choice-card register-card">
+          <div class="brand-plate compact-plate">
+            <img src="./assets/auth-mascot.jpg" alt="X·EasyGo mascot illustration" class="brand-illustration" />
+          </div>
+          <h2 id="authChoiceTitle">Choose Login Or Register</h2>
+
+          <div class="chip-grid auth-mode-switch">
+            <button class="choice-chip active" id="registerModeBtn" type="button">Register</button>
+            <button class="choice-chip" id="loginModeBtn" type="button">Login</button>
+          </div>
+
+          <p class="status-text" id="authChoiceStatus">
+            Choose one option to continue to the next step.
+          </p>
+
+          <div class="button-row auth-choice-actions">
+            <button class="ghost-btn" id="backToIntroFromChoiceBtn">Back To Language</button>
+          </div>
+        </div>
+      </section>
+
       <section class="screen hidden" id="registerScreen">
         <div class="screen-card choice-card register-card">
           <div class="brand-plate compact-plate">
             <img src="./assets/auth-mascot.jpg" alt="X·EasyGo mascot illustration" class="brand-illustration" />
           </div>
           <h2 id="registerTitle">Create Your Account</h2>
-
-          <div class="chip-grid auth-mode-switch">
-            <button class="choice-chip active" id="registerModeBtn" type="button">Register</button>
-            <button class="choice-chip" id="loginModeBtn" type="button">Login</button>
-          </div>
 
           <form class="register-form" id="registerForm">
             <label class="select-field" id="nameField">
@@ -83,7 +100,7 @@
           </p>
 
           <div class="button-row auth-actions">
-            <button class="ghost-btn" id="backToIntroFromRegisterBtn">Back To Language</button>
+            <button class="ghost-btn" id="backToIntroFromRegisterBtn">Back</button>
             <button class="primary-btn" id="registerSubmitBtn">Register And Continue</button>
           </div>
         </div>

@@ -492,6 +492,10 @@ select:focus {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.auth-choice-actions {
+  justify-content: flex-start;
+}
+
 .auth-requirements {
   display: grid;
   gap: 8px;
