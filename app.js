@@ -44,6 +44,16 @@ const texts = {
     hubStampBtn: "🏅 Stamp Collection",
     hubMessageBtn: "💬 留言",
     hubUserInfoBtn: "👤 User Information",
+    userInfoKicker: "用户信息",
+    userInfoTitle: "当前用户信息",
+    userInfoNameLabel: "用户名",
+    userInfoIdentityLabel: "身份",
+    userInfoLanguageLabel: "语言",
+    userInfoStampLabel: "已收集印章",
+    userInfoLanguageValueZh: "中文",
+    userInfoLanguageValueEn: "English",
+    userInfoStampCount: (count) => `${count} 枚`,
+    backFromUserInfoBtn: "返回",
     messageKicker: "留言板",
     messageTitle: "参观留言",
     messageInputLabel: "留下你的参观留言",
@@ -164,6 +174,16 @@ const texts = {
     hubStampBtn: "🏅 Stamp Collection",
     hubMessageBtn: "💬 Message",
     hubUserInfoBtn: "👤 User Information",
+    userInfoKicker: "User Information",
+    userInfoTitle: "Your Profile",
+    userInfoNameLabel: "Username",
+    userInfoIdentityLabel: "Identity",
+    userInfoLanguageLabel: "Language",
+    userInfoStampLabel: "Collected Stamps",
+    userInfoLanguageValueZh: "Chinese",
+    userInfoLanguageValueEn: "English",
+    userInfoStampCount: (count) => `${count}`,
+    backFromUserInfoBtn: "Back",
     messageKicker: "Message Board",
     messageTitle: "Visitor Messages",
     messageInputLabel: "Leave a message",
@@ -333,6 +353,7 @@ const elements = {
   registerScreen: document.getElementById("registerScreen"),
   roleScreen: document.getElementById("roleScreen"),
   hubScreen: document.getElementById("hubScreen"),
+  userInfoScreen: document.getElementById("userInfoScreen"),
   mapScreen: document.getElementById("mapScreen"),
   arrivalScreen: document.getElementById("arrivalScreen"),
   arScreen: document.getElementById("arScreen"),
@@ -362,6 +383,11 @@ const elements = {
   hubStampBtn: document.getElementById("hubStampBtn"),
   hubMessageBtn: document.getElementById("hubMessageBtn"),
   hubUserInfoBtn: document.getElementById("hubUserInfoBtn"),
+  userInfoNameValue: document.getElementById("userInfoNameValue"),
+  userInfoIdentityValue: document.getElementById("userInfoIdentityValue"),
+  userInfoLanguageValue: document.getElementById("userInfoLanguageValue"),
+  userInfoStampValue: document.getElementById("userInfoStampValue"),
+  backFromUserInfoBtn: document.getElementById("backFromUserInfoBtn"),
   messageForm: document.getElementById("messageForm"),
   messageInput: document.getElementById("messageInput"),
   messageStatus: document.getElementById("messageStatus"),
@@ -441,6 +467,13 @@ const translatableIds = [
   "hubStampBtn",
   "hubMessageBtn",
   "hubUserInfoBtn",
+  "userInfoKicker",
+  "userInfoTitle",
+  "userInfoNameLabel",
+  "userInfoIdentityLabel",
+  "userInfoLanguageLabel",
+  "userInfoStampLabel",
+  "backFromUserInfoBtn",
   "messageKicker",
   "messageTitle",
   "messageInputLabel",
@@ -483,7 +516,7 @@ const translatableIds = [
 ];
 
 function showScreen(screen) {
-  [elements.introScreen, elements.registerScreen, elements.roleScreen, elements.hubScreen, elements.mapScreen, elements.arrivalScreen, elements.arScreen, elements.stampScreen, elements.messageScreen, elements.leaderboardScreen].forEach((node) => {
+  [elements.introScreen, elements.registerScreen, elements.roleScreen, elements.hubScreen, elements.userInfoScreen, elements.mapScreen, elements.arrivalScreen, elements.arScreen, elements.stampScreen, elements.messageScreen, elements.leaderboardScreen].forEach((node) => {
     node.classList.add("hidden");
     node.classList.remove("screen-active");
   });
@@ -550,6 +583,18 @@ function renderLeaderboardRows(rows) {
       .join("");
 }
 
+function renderUserInfo() {
+  const t = getCopy();
+  elements.userInfoNameValue.textContent =
+    state.username ||
+    state.registeredUser?.user_metadata?.username ||
+    "--";
+  elements.userInfoIdentityValue.textContent = state.role ? t[state.role] : "--";
+  elements.userInfoLanguageValue.textContent =
+    state.language === "zh" ? t.userInfoLanguageValueZh : t.userInfoLanguageValueEn;
+  elements.userInfoStampValue.textContent = t.userInfoStampCount(state.collectedStamps.length);
+}
+
 function renderMessageBoard(rows) {
   const t = getCopy();
 
@@ -557,6 +602,8 @@ function renderMessageBoard(rows) {
     elements.messageMarqueeTrack.innerHTML = `<p class="message-empty">${t.messageBoardEmpty}</p>`;
     elements.messageMarqueeTrack.classList.remove("is-scrolling");
     elements.messageMarqueeTrack.style.removeProperty("--message-scroll-distance");
+    elements.messageMarqueeTrack.style.removeProperty("--message-track-width");
+    elements.messageMarqueeTrack.style.removeProperty("--message-shell-width");
     return;
   }
 
@@ -577,12 +624,12 @@ function renderMessageBoard(rows) {
   elements.messageMarqueeTrack.innerHTML = `<div class="message-marquee-column">${cardMarkup}</div>`;
 
   requestAnimationFrame(() => {
-    const shellHeight = elements.messageWallShell?.clientHeight || 0;
-    const trackHeight = elements.messageMarqueeTrack?.scrollHeight || 0;
-    const distance = Math.max(0, trackHeight - shellHeight + 32);
+    const shellWidth = elements.messageWallShell?.clientWidth || 0;
+    const trackWidth = elements.messageMarqueeTrack?.scrollWidth || 0;
 
-    elements.messageMarqueeTrack.style.setProperty("--message-scroll-distance", `${distance}px`);
-    elements.messageMarqueeTrack.classList.toggle("is-scrolling", distance > 24);
+    elements.messageMarqueeTrack.style.setProperty("--message-shell-width", `${shellWidth}px`);
+    elements.messageMarqueeTrack.style.setProperty("--message-track-width", `${trackWidth}px`);
+    elements.messageMarqueeTrack.classList.toggle("is-scrolling", trackWidth > 0 && shellWidth > 0);
   });
 }
 
@@ -707,6 +754,7 @@ function applyTranslations() {
   elements.ocrStatus.textContent = t.ocrStatus;
   updateNarration();
   renderStampBook();
+  renderUserInfo();
 }
 
 function syncAuthModeUi() {
@@ -1377,7 +1425,13 @@ elements.hubStampBtn.addEventListener("click", () => {
   showScreen(elements.stampScreen);
 });
 elements.hubMessageBtn.addEventListener("click", openMessageScreen);
-elements.hubUserInfoBtn.addEventListener("click", () => {});
+elements.hubUserInfoBtn.addEventListener("click", () => {
+  renderUserInfo();
+  showScreen(elements.userInfoScreen);
+});
+elements.backFromUserInfoBtn.addEventListener("click", () => {
+  showScreen(elements.hubScreen);
+});
 elements.submitMessageBtn.addEventListener("click", submitMessage);
 elements.messageForm.addEventListener("submit", (event) => {
   event.preventDefault();
