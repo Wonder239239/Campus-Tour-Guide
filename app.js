@@ -338,7 +338,9 @@ const state = {
   registeredUser: null,
   username: "",
   collectedStamps: [],
-  previousScreen: "map"
+  previousScreen: "map",
+  isArrivalTransitioning: false,
+  arrivalTimeoutId: null
 };
 
 const stampDefinitions = [
@@ -1101,7 +1103,17 @@ function stopArCamera() {
   }
 }
 
+function clearArrivalTransition() {
+  state.isArrivalTransitioning = false;
+
+  if (state.arrivalTimeoutId !== null) {
+    window.clearTimeout(state.arrivalTimeoutId);
+    state.arrivalTimeoutId = null;
+  }
+}
+
 async function openArScreen(poi) {
+  clearArrivalTransition();
   state.activePoi = poi;
   updateNarration();
   showScreen(elements.arScreen);
@@ -1111,11 +1123,14 @@ async function openArScreen(poi) {
 }
 
 function openArrivalScreen(poi) {
+  clearArrivalTransition();
+  state.isArrivalTransitioning = true;
   state.activePoi = poi;
   const t = getCopy();
   showScreen(elements.arrivalScreen);
   elements.arrivalMessage.textContent = t.arrivalLocated(t[poi.nameKey]);
-  window.setTimeout(() => {
+  state.arrivalTimeoutId = window.setTimeout(() => {
+    state.arrivalTimeoutId = null;
     openArScreen(poi);
   }, 5000);
 }
@@ -1395,6 +1410,10 @@ function closeScanOverlay() {
 }
 
 function handleArrival(poi) {
+  if (state.isArrivalTransitioning || elements.arScreen.classList.contains("screen-active")) {
+    return;
+  }
+
   state.activePoi = poi;
   elements.mapStatusLine.textContent = getCopy().arrived(poi.code);
   openArrivalScreen(poi);
@@ -1431,6 +1450,7 @@ function handleLocationError() {
 }
 
 function requestLocation() {
+  clearArrivalTransition();
   renderMap();
   elements.mapStatusLine.textContent = getCopy().requestingLocation;
   renderDistancePanel();
@@ -1503,6 +1523,7 @@ elements.goMapBtn.addEventListener("click", async () => {
 
 elements.startLocationBtn.addEventListener("click", requestLocation);
 elements.hubCampusMapBtn.addEventListener("click", () => {
+  clearArrivalTransition();
   showScreen(elements.mapScreen);
   renderMap();
 });
@@ -1525,6 +1546,7 @@ elements.messageForm.addEventListener("submit", (event) => {
   submitMessage();
 });
 elements.backFromMessageBtn.addEventListener("click", () => {
+  clearArrivalTransition();
   showScreen(elements.hubScreen);
 });
 elements.demoArrivalBtn.addEventListener("click", () => openArScreen(state.activePoi));
@@ -1543,6 +1565,7 @@ elements.closeScanBtn.addEventListener("click", closeScanOverlay);
 elements.playAudioBtn.addEventListener("click", speakNarration);
 elements.stopAudioBtn.addEventListener("click", () => window.speechSynthesis.cancel());
 elements.backFromStampBtn.addEventListener("click", () => {
+  clearArrivalTransition();
   if (state.previousScreen === "ar") {
     showScreen(elements.arScreen);
     startArCamera();
@@ -1562,6 +1585,7 @@ elements.backFromLeaderboardBtn.addEventListener("click", () => {
   showScreen(elements.stampScreen);
 });
 elements.backToMapBtn.addEventListener("click", () => {
+  clearArrivalTransition();
   window.speechSynthesis.cancel();
   closeScanOverlay();
   stopArCamera();
