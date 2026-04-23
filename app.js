@@ -78,6 +78,7 @@ const texts = {
     hall: "SD（Science Building D）",
     mapStatusLine: "",
     startLocationBtn: "启动实时定位",
+    enterNarrationBtn: "进入讲解",
     demoArrivalBtn: "演示模式：直接进入 AR",
     openStampBookBtn: "返回",
     arrivalKicker: "定位完成",
@@ -129,6 +130,8 @@ const texts = {
     requestingLocation: "正在请求定位权限，请允许浏览器访问当前设备位置。",
     locating: "定位成功，系统正在判断你是否已进入目标建筑识别范围。",
     noNearby: () => "实时定位中",
+    narrationReady: (name) => `已进入 ${name} 范围，点击“进入讲解”继续。`,
+    narrationNotReady: "尚未进入目标范围，请继续靠近建筑。",
     arrived: (name) => `已进入 ${name} 范围，系统正在播放讲解。`,
     locationDenied: "未获取到定位权限。请打开浏览器的站点设置或系统设置，将此网页的位置权限改为允许后重试；也可以先使用演示模式继续展示。"
   },
@@ -211,6 +214,7 @@ const texts = {
     hall: "SD (Science Building D)",
     mapStatusLine: "",
     startLocationBtn: "Start Live Positioning",
+    enterNarrationBtn: "Enter Narration",
     demoArrivalBtn: "Demo Mode: Enter AR Directly",
     openStampBookBtn: "Back",
     arrivalKicker: "Location Confirmed",
@@ -262,6 +266,8 @@ const texts = {
     requestingLocation: "Requesting location permission. Please allow the browser to access the current device position.",
     locating: "Location received. The system is checking whether you have entered the recognition range of the target building.",
     noNearby: () => "Live positioning active",
+    narrationReady: (name) => `You are within the ${name} area. Tap "Enter Narration" to continue.`,
+    narrationNotReady: "You have not entered a narration area yet. Move closer to the building.",
     arrived: (name) => `You have entered the ${name} range. The narration is now starting.`,
     locationDenied: "Location permission was not granted. Open this site's browser permission settings or your phone's system settings, change Location to Allow, then try again. You can also continue with demo mode."
   }
@@ -339,6 +345,7 @@ const state = {
   username: "",
   collectedStamps: [],
   previousScreen: "map",
+  inRangePoi: null,
   isArrivalTransitioning: false,
   arrivalTimeoutId: null
 };
@@ -407,6 +414,7 @@ const elements = {
   backFromMessageBtn: document.getElementById("backFromMessageBtn"),
   messageMarqueeTrack: document.getElementById("messageMarqueeTrack"),
   startLocationBtn: document.getElementById("startLocationBtn"),
+  enterNarrationBtn: document.getElementById("enterNarrationBtn"),
   demoArrivalBtn: document.getElementById("demoArrivalBtn"),
   openStampBookBtn: document.getElementById("openStampBookBtn"),
   arrivalMessage: document.getElementById("arrivalMessage"),
@@ -500,6 +508,7 @@ const translatableIds = [
   "mapTitle",
   "mapStatusLine",
   "startLocationBtn",
+  "enterNarrationBtn",
   "demoArrivalBtn",
   "openStampBookBtn",
   "arrivalKicker",
@@ -1040,6 +1049,20 @@ function renderDistancePanel(position = null) {
   });
 }
 
+function updateNarrationEntryState() {
+  const t = getCopy();
+
+  if (!elements.enterNarrationBtn) {
+    return;
+  }
+
+  elements.enterNarrationBtn.disabled = !state.inRangePoi;
+
+  if (state.inRangePoi) {
+    elements.mapStatusLine.textContent = t.narrationReady(state.inRangePoi.code);
+  }
+}
+
 function renderPoiLines(position) {
   poiLines.forEach((line) => line.remove());
   poiLines = [];
@@ -1437,12 +1460,12 @@ function handleLocationSuccess(position) {
   map.flyTo(latLng, Math.max(map.getZoom(), 18), { duration: 0.8 });
 
   if (nearest.distance <= nearest.poi.radius) {
-    if (watchId !== null) {
-      navigator.geolocation.clearWatch(watchId);
-      watchId = null;
-    }
-    handleArrival(nearest.poi);
+    state.inRangePoi = nearest.poi;
+    updateNarrationEntryState();
+    return;
   }
+
+  state.inRangePoi = null;
 }
 
 function handleLocationError() {
@@ -1451,9 +1474,11 @@ function handleLocationError() {
 
 function requestLocation() {
   clearArrivalTransition();
+  state.inRangePoi = null;
   renderMap();
   elements.mapStatusLine.textContent = getCopy().requestingLocation;
   renderDistancePanel();
+  updateNarrationEntryState();
 
   if (!navigator.geolocation) {
     handleLocationError();
@@ -1522,6 +1547,19 @@ elements.goMapBtn.addEventListener("click", async () => {
 });
 
 elements.startLocationBtn.addEventListener("click", requestLocation);
+elements.enterNarrationBtn.addEventListener("click", () => {
+  if (!state.inRangePoi) {
+    elements.mapStatusLine.textContent = getCopy().narrationNotReady;
+    return;
+  }
+
+  if (watchId !== null) {
+    navigator.geolocation.clearWatch(watchId);
+    watchId = null;
+  }
+
+  handleArrival(state.inRangePoi);
+});
 elements.hubCampusMapBtn.addEventListener("click", () => {
   clearArrivalTransition();
   showScreen(elements.mapScreen);
@@ -1586,11 +1624,13 @@ elements.backFromLeaderboardBtn.addEventListener("click", () => {
 });
 elements.backToMapBtn.addEventListener("click", () => {
   clearArrivalTransition();
+  state.inRangePoi = null;
   window.speechSynthesis.cancel();
   closeScanOverlay();
   stopArCamera();
   showScreen(elements.mapScreen);
   renderMap();
+  updateNarrationEntryState();
 });
 
 applyTranslations();

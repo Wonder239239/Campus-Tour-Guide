@@ -702,6 +702,15 @@ select:focus {
   transform: translateY(-1px);
 }
 
+.primary-btn:disabled,
+.ghost-btn:disabled,
+.choice-chip:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 .section-heading,
 .camera-header {
   display: flex;
