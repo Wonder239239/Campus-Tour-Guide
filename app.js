@@ -465,6 +465,7 @@ let motionEnabled = false;
 let scanStream = null;
 let scanIntervalId = null;
 let scanBusy = false;
+let narrationPrimed = false;
 
 const translatableIds = [
   "heroTag",
@@ -1140,8 +1141,11 @@ async function openArScreen(poi) {
   state.activePoi = poi;
   updateNarration();
   showScreen(elements.arScreen);
-  window.speechSynthesis.cancel();
-  speakNarration();
+  if (!narrationPrimed) {
+    window.speechSynthesis.cancel();
+    speakNarration();
+  }
+  narrationPrimed = false;
   await startArCamera();
   enableMotionControl();
 }
@@ -1439,6 +1443,10 @@ function handleArrival(poi) {
   }
 
   state.activePoi = poi;
+  updateNarration();
+  window.speechSynthesis.cancel();
+  speakNarration();
+  narrationPrimed = true;
   elements.mapStatusLine.textContent = getCopy().arrived(poi.code);
   openArrivalScreen(poi);
 }
@@ -1625,6 +1633,7 @@ elements.backFromLeaderboardBtn.addEventListener("click", () => {
 });
 elements.backToMapBtn.addEventListener("click", () => {
   clearArrivalTransition();
+  narrationPrimed = false;
   state.inRangePoi = null;
   window.speechSynthesis.cancel();
   closeScanOverlay();
