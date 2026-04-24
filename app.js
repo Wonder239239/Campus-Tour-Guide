@@ -1160,7 +1160,7 @@ function openArrivalScreen(poi) {
   state.arrivalTimeoutId = window.setTimeout(() => {
     state.arrivalTimeoutId = null;
     openArScreen(poi);
-  }, 5000);
+  }, 3000);
 }
 
 function matchPoiFromText(rawText) {
