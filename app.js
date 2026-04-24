@@ -1140,9 +1140,10 @@ async function openArScreen(poi) {
   state.activePoi = poi;
   updateNarration();
   showScreen(elements.arScreen);
+  window.speechSynthesis.cancel();
+  speakNarration();
   await startArCamera();
   enableMotionControl();
-  speakNarration();
 }
 
 function openArrivalScreen(poi) {
